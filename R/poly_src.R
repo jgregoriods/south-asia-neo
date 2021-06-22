@@ -26,9 +26,8 @@ ELE <- normRaster((ELE_RAW)^(1/3))
 # Remove outliers and 0 (for log transform)
 maxVal <- quantile(PREC_RAW, .99)
 PREC_RAW[values(PREC_RAW > maxVal)] <- maxVal
-PREC_RAW[values(PREC_RAW) <= 0] <- 0.1
 
-PREC <- normRaster(log(PREC_RAW))
+PREC <- normRaster(log(PREC_RAW + 1))
 PREC <- abs(PREC - 1)
 
 
@@ -163,7 +162,7 @@ best <- as.numeric(genomes[1,])
 costEle <- getCost(ELE, as.numeric(best[1:3]))
 costPrc <- getCost(PREC, as.numeric(best[4:6]))
 cost <- costEle+costPrc
-simDates <- simulateDispersal(costEle+costPrc, ORIGIN, START)
+simDates <- simulateDispersal(cost, ORIGIN, START)
 #plot(simDates)
 
 #compareDates(simDates, DATES)
