@@ -73,11 +73,11 @@ mutate <- function(x) {
     return(x)
 }
 
-numGenomes <- 100
-numParents <- 20
-numElite <- 5
+numGenomes <- 200
+numParents <- 50
+numElite <- 10
 mutationRate <- 0.2
-numIter <- 50
+numIter <- 20
 
 # Initialize genomes
 genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=9))
@@ -89,8 +89,8 @@ maxScores <- c()
 avgScores <- c()
 
 cat("Running genetic algorithm. This may take a while...\n")
-#pb <- txtProgressBar(min=0, max=numIter, style=3)
-#setTxtProgressBar(pb, 0)
+pb <- txtProgressBar(min=0, max=numIter, style=3)
+setTxtProgressBar(pb, 0)
 for (iter in 1:numIter) {
     genomeList <- split(genomes, seq(nrow(genomes)))
 
@@ -152,9 +152,9 @@ for (iter in 1:numIter) {
     }
     genomes <- rbind(elite, children)
     rownames(genomes) <- sample(1:numGenomes)
-    #setTxtProgressBar(pb, iter)
+    setTxtProgressBar(pb, iter)
 }
-#close(pb)
+close(pb)
 
 plot(avgScores, type="l", col="blue")
 lines(maxScores, col="red")

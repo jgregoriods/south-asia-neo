@@ -28,7 +28,6 @@ maxVal <- quantile(PREC_RAW, .99)
 PREC_RAW[values(PREC_RAW > maxVal)] <- maxVal
 
 PREC <- normRaster(log(PREC_RAW + 1))
-PREC <- abs(PREC - 1)
 
 
 simulateDispersal <- function(costRaster, origin, date) {
@@ -61,24 +60,12 @@ testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {
 }
 
 
-qtl <- function(x, newVals=1:4) {
-    vals <- quantile(x, na.rm=T)
-    m <- c(vals[1], vals[2], newVals[1],
-           vals[2], vals[3], newVals[2],
-           vals[3], vals[4], newVals[3],
-           vals[4], vals[5], newVals[4])
-    rclmat <- matrix(m, ncol=3, byrow=T)
-    rc <- reclassify(x, rclmat)
-    rc[values(rc) == vals[1]] <- newVals[1]
-    return(rc)
-}
-
-
 getCost <- function(x, coefs) {
     a <- coefs[1]
     b <- coefs[2]
     c <- coefs[3]
-    return(abs((a*(x^2)) + (b*x) + c))
+    d <- coefs[4]
+    return(abs((a*(x^3)) + (b*(x^2)) + (c*x) + d))
 }
 
 
@@ -95,16 +82,16 @@ mutate <- function(x) {
     return(x)
 }
 
-numGenomes <- 100
-numParents <- 20
+numGenomes <- 200
+numParents <- 50
 numElite <- 5
 mutationRate <- 0.2
 numIter <- 20
 
 # Initialize genomes
-genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=7))
+genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=9))
 for (i in 1:numGenomes) {
-    genomes[i,] <- c(rnorm(6, mean=1, sd=3), Inf)
+    genomes[i,] <- c(rnorm(8, mean=1, sd=3), Inf)
 }
 
 maxScores <- c()
@@ -114,33 +101,56 @@ cat("Running genetic algorithm. This may take a while...\n")
 pb <- txtProgressBar(min=0, max=numIter, style=3)
 setTxtProgressBar(pb, 0)
 for (iter in 1:numIter) {
+    genomeList <- split(genomes, seq(nrow(genomes)))
 
-    for (i in 1:numGenomes) {
-        if (genomes[i,7] == Inf) {
-            costEle <- getCost(ELE, as.numeric(genomes[i,][1:3]))
-            costPrc <- getCost(PREC, as.numeric(genomes[i,][4:6]))
-            genomes[i,7] <- testModel(costEle+costPrc)
+    ncores <- detectCores() - 1
+    cl <- makeCluster(ncores)
+    clusterEvalQ(cl, library("gdistance"))
+    clusterExport(cl, varlist=c("ELE", "PREC", "ORIGIN", "START", "DATES",
+                                "testModel", "simulateDispersal", "getCost"),
+                                envir=environment())
+
+    res <- parLapply(cl, genomeList, function(x) {
+        if (x[1,9] != Inf) {
+            return (x[1,9])
+        } else {
+            costEle <- getCost(ELE, as.numeric(x[1,1:4]))
+            costPrc <- getCost(PREC, as.numeric(x[1,5:8]))
+            score <- testModel((costEle+costPrc))
             gc()
+            return(score)
         }
-    }
+    })
+    stopCluster(cl)
+    genomes[,9] <- unlist(res)
+
+    #for (i in 1:numGenomes) {
+    #    if (genomes[i,9] == Inf) {
+    #        costEle <- getCost(ELE, as.numeric(genomes[i,][1:4]))
+    #        costPrc <- getCost(PREC, as.numeric(genomes[i,][5:8]))
+    #        genomes[i,9] <- testModel(costEle+costPrc)
+    #        gc()
+    #    }
+    #}
     
-    avgScores[iter] <- mean(genomes[,7])
+
+    avgScores[iter] <- mean(genomes[,9])
     
-    elite <- genomes[order(genomes[,7]),][1:numElite,]
-    parents <- genomes[order(genomes[,7]),][1:numParents,]
+    elite <- genomes[order(genomes[,9]),][1:numElite,]
+    parents <- genomes[order(genomes[,9]),][1:numParents,]
     parents <- parents[order(as.numeric(rownames(parents))),]
 
-    maxScores[iter] <- elite[1,7]
+    maxScores[iter] <- elite[1,9]
 
-    children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=7))
+    children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=9))
     j <- 1
     while (j <= numGenomes - numElite) {
         for (i in seq(1, numParents, 2)) {
             if (j > numGenomes - numElite) {
                 break
             }
-            parent1 <- as.numeric(parents[i,])[1:6]
-            parent2 <- as.numeric(parents[i+1,])[1:6]
+            parent1 <- as.numeric(parents[i,])[1:8]
+            parent2 <- as.numeric(parents[i+1,])[1:8]
             child <- crossover(parent1, parent2)
             if (runif(1) < mutationRate) {
                 child <- mutate(child)
@@ -155,17 +165,17 @@ for (iter in 1:numIter) {
 }
 close(pb)
 
-#plot(avgScores, type="l", col="blue")
-#lines(maxScores, col="red")
+plot(avgScores, type="l", col="blue")
+lines(maxScores, col="red")
 
 best <- as.numeric(genomes[1,])
-costEle <- getCost(ELE, as.numeric(best[1:3]))
-costPrc <- getCost(PREC, as.numeric(best[4:6]))
+costEle <- getCost(ELE, as.numeric(best[1:4]))
+costPrc <- getCost(PREC, as.numeric(best[5:8]))
 cost <- costEle+costPrc
 simDates <- simulateDispersal(cost, ORIGIN, START)
-#plot(simDates)
+plot(simDates)
 
-#compareDates(simDates, DATES)
+compareDates(simDates, DATES)
 
 write.csv(avgScores, "avgScores.csv")
 write.csv(maxScores, "maxScores.csv")

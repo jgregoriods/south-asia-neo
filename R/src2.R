@@ -104,7 +104,7 @@ avgScores <- c()
 
 cat("Running genetic algorithm. This may take a while...\n")
 for (iter in 1:numIter) {
-    genomeList <- params <- split(genomes, seq(nrow(genomes)))
+    genomeList <- split(genomes, seq(nrow(genomes)))
 
     ncores <- detectCores() - 1
     cl <- makeCluster(ncores)
