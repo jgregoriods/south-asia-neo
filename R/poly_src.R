@@ -1,15 +1,16 @@
 library(gdistance)
-#library(rcarbon)
+library(rcarbon)
 library(parallel)
 
 ORIGIN <- c(42.45, 36.37)
-START <- 11748
+START <- 11750
+
 DATES <- read.csv("sites/dates.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- CRS("+init=epsg:4326")
 
-#cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
-#DATES$bp <- medCal(cal)
+cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
+DATES$bp <- medCal(cal)
 
 ELE_RAW <- raster("layers/ele.tif")
 PREC_RAW <- raster("layers/prec.tif")
@@ -21,14 +22,16 @@ normRaster <- function(x) {
 
 
 # Transform and scale
-ELE <- normRaster((ELE_RAW)^(1/3))
+#ELE <- normRaster((ELE_RAW)^(1/3))
 
 # Remove outliers and 0 (for log transform)
 maxVal <- quantile(PREC_RAW, .99)
 PREC_RAW[values(PREC_RAW > maxVal)] <- maxVal
 
-PREC <- normRaster(log(PREC_RAW + 1))
+#PREC <- normRaster(log(PREC_RAW + 1))
 
+ELE <- normRaster(ELE_RAW)
+PREC <- normRaster(PREC_RAW)
 
 simulateDispersal <- function(costRaster, origin, date) {
     tr <- transition(costRaster, function(x) 1 / mean(x), 16)
@@ -82,7 +85,7 @@ mutate <- function(x) {
     return(x)
 }
 
-numGenomes <- 200
+numGenomes <- 100
 numParents <- 50
 numElite <- 5
 mutationRate <- 0.2
