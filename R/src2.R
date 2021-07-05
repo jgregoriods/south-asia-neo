@@ -13,7 +13,7 @@ proj4string(DATES) <- CRS("+init=epsg:4326")
 cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 DATES$bp <- medCal(cal)
 
-ELE_RAW <- raster("layers/temp_cold.tif")
+TEMP_RAW <- raster("layers/temp_cold.tif")
 PREC_RAW <- raster("layers/prec.tif")
 
 
@@ -24,11 +24,10 @@ normRaster <- function(x) {
 
 # Transform and scale
 #ELE <- normRaster((ELE_RAW)^(1/3))
-ELE <- normRaster(ELE_RAW)
+TEMP <- normRaster(TEMP_RAW)
 
 # Remove outliers and 0 (for log transform)
-maxVal <- quantile(PREC_RAW, .99)
-PREC_RAW[values(PREC_RAW > maxVal)] <- maxVal
+PREC_RAW[values(PREC_RAW > quantile(PREC_RAW, .99))] <- quantile(PREC_RAW, .99)
 #PREC <- normRaster(log(PREC_RAW + 1))
 PREC <- normRaster(PREC_RAW)
 
@@ -82,64 +81,62 @@ mutationRate <- 0.2
 numIter <- 20
 
 # Initialize genomes
-genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=5))
+genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=4))
 for (i in 1:numGenomes) {
-    genomes[i,] <- c(rnorm(4, sd=3), Inf)
+    genomes[i,] <- c(rnorm(3), Inf)
 }
 
 maxScores <- c()
 avgScores <- c()
 
-cat("Running genetic algorithm. This may take a while...\n")
+ncores <- detectCores() - 1
+cl <- makeCluster(ncores)
+clusterEvalQ(cl, library("gdistance"))
+clusterExport(cl, varlist=c("TEMP", "PREC", "ORIGIN", "START", "DATES",
+                            "testModel", "simulateDispersal"),
+                            envir=environment())
+
+cat(paste("\nRunning genetic algorithm on", ncores,
+          "parallel workers.\nThis may take a while...\n"))
 pb <- txtProgressBar(min=0, max=numIter, style=3)
 setTxtProgressBar(pb, 0)
 for (iter in 1:numIter) {
     genomeList <- split(genomes, seq(nrow(genomes)))
 
-    #ncores <- detectCores() - 1
-    ncores <- 8
-    cl <- makeCluster(ncores)
-    clusterEvalQ(cl, library("gdistance"))
-    clusterExport(cl, varlist=c("ELE", "PREC", "ORIGIN", "START", "DATES",
-                                "testModel", "simulateDispersal"),
-                                envir=environment())
-
     res <- parLapply(cl, genomeList, function(x) {
-        if (x[1,5] != Inf) {
-            return (x[1,5])
+        if (x[1,4] != Inf) {
+            return (x[1,4])
         } else {
-            costEle <- (ELE * x[1,1]) + x[1,2]
-            costPrc <- (PREC * x[1,3]) + x[1,4]
-            if (min(values(costEle+costPrc), na.rm=T) <= 0) {
+            cost <- (TEMP * x[1,1]) + (PREC * x[1,2]) + x[1,3]
+            if (min(values(cost), na.rm=T) <= 0) {
                 return(Inf)
             } else {
-                score <- testModel(costEle+costPrc)
+                score <- testModel(cost)
                 gc()
                 return(score)
             }
         }
     })
 
-    stopCluster(cl)
-    genomes[,5] <- unlist(res)
+    genomes[,4] <- unlist(res)
 
-    avgScores[iter] <- mean(genomes[,5][!is.infinite(genomes[,5])])
+    avgScores[iter] <- mean(genomes[,4][!is.infinite(genomes[,4])])
 
-    elite <- genomes[order(genomes[,5]),][1:numElite,]
-    parents <- genomes[order(genomes[,5]),][1:numParents,]
+    elite <- genomes[order(genomes[,4]),][1:numElite,]
+    parents <- genomes[order(genomes[,4]),][1:numParents,]
     parents <- parents[order(as.numeric(rownames(parents))),]
 
-    maxScores[iter] <- elite[1,5]
+    maxScores[iter] <- elite[1,4]
 
-    children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=5))
+    children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=4))
     j <- 1
     while (j <= numGenomes - numElite) {
         for (i in seq(1, numParents - 1, 2)) {
             if (j > numGenomes - numElite) {
                 break
             }
-            parent1 <- as.numeric(parents[i,])[1:4]
-            parent2 <- as.numeric(parents[i+1,])[1:4]
+            parent1 <- as.numeric(parents[i,])[1:3]
+            parent2 <- as.numeric(parents[i+1,])[1:3]
             child <- crossover(parent1, parent2)
             if (runif(1) < mutationRate) {
                 child <- mutate(child)
@@ -154,12 +151,14 @@ for (iter in 1:numIter) {
 }
 close(pb)
 
+stopCluster(cl)
+
 par(mfrow=c(2,2))
 plot(avgScores, type="l", col="blue", main="RMSE", ylim=c(0, max(avgScores)))
 lines(maxScores, col="red")
 
 best <- as.numeric(genomes[1,])
-costRaster <- (((ELE * best[1]) + best[2]) + ((PREC * best[3]) + best[4]))
+costRaster <- ((TEMP * best[1]) + (PREC * best[2]) + best[3])
 simDates <- simulateDispersal(costRaster, ORIGIN, START)
 
 compareDates(simDates, DATES)
