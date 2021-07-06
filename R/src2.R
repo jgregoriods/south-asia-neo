@@ -1,17 +1,22 @@
 suppressPackageStartupMessages({
     library(gdistance)
-    library(rcarbon)
+    #library(rcarbon)
+    library(rgdal)
     library(parallel)
+    library(viridis)
 })
 
 ORIGIN <- c(42.45, 36.37)
 START <- 11748
-DATES <- read.csv("sites/dates.csv")
+DATES <- read.csv("sites/dates100.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- CRS("+init=epsg:4326")
 
-cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
-DATES$bp <- medCal(cal)
+#coast <- ne_download(scale=10, type="coastline", category="physical")
+coast <- readOGR("layers/ocean.shp")
+
+#cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
+#DATES$bp <- medCal(cal)
 
 TEMP_RAW <- raster("layers/temp_cold.tif")
 PREC_RAW <- raster("layers/prec.tif")
@@ -46,8 +51,14 @@ simulateDispersal <- function(costRaster, origin, date) {
 compareDates <- function(simRaster, dates) {
     dates$simbp <- extract(simRaster, dates)
     dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
-    plot(dates$dist, dates$bp)
-    points(dates$dist, dates$simbp, col="red")
+
+    model <- lm(simbp~poly(dist, 2), data=dates)
+    x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)
+    y <- predict(model, newdata=data.frame(dist=x))
+
+    plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="cal BP", pch=20)
+    points(dates$dist, dates$simbp, col=4, pch=20)
+    lines(x, y, col=4)
 }
 
 
@@ -76,8 +87,8 @@ mutate <- function(x) {
 
 numGenomes <- 100
 numParents <- 50
-numElite <- 5
-mutationRate <- 0.2
+numElite <- 10
+mutationRate <- 0.1
 numIter <- 20
 
 # Initialize genomes
@@ -153,15 +164,42 @@ close(pb)
 
 stopCluster(cl)
 
-par(mfrow=c(2,2))
-plot(avgScores, type="l", col="blue", main="RMSE", ylim=c(0, max(avgScores)))
-lines(maxScores, col="red")
+
+plotMap <- function(r) {
+    ext <- extent(r)
+    plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),
+         main="Simulated arrival times (cal BP)", xlab="Long", ylab="Lat")
+    minDate <- floor(min(values(r), na.rm=T) / 1000) * 1000
+    contour(r, add=T, levels=seq(minDate, max(values(r), na.rm=T), 1000))
+    plot(coast, add=T, lwd=1.5)
+}
+
+
+plotSpeed <- function(r) {
+    ext <- extent(r)
+    plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),
+         main="Simulated speed (km/yr)", xlab="Long", ylab="Lat")
+    contour(r, add=T, levels=seq(0, max(values(r), na.rm=T), 0.1))
+    plot(coast, add=T, lwd=1.5)
+}
+
 
 best <- as.numeric(genomes[1,])
 costRaster <- ((TEMP * best[1]) + (PREC * best[2]) + best[3])
 simDates <- simulateDispersal(costRaster, ORIGIN, START)
 
+cat(paste("Best score:", best[4], "\n"))
+write.csv(genomes, "results.csv")
+
+par(mfrow=c(2,2))
+plot(avgScores, col="blue", main="RMSE", ylim=c(min(maxScores), max(avgScores)),
+     pch=0, type="b", ylab="RMSE", xlab="Generation")
+lines(maxScores, col="red", pch=0, type="b")
+legend("topright", legend = c("Avg score", "Best score"),
+       col = c("blue", "red"), lty = 1:1)
+
+
 compareDates(simDates, DATES)
 
-plot(1/costRaster, main="Speed (km/yr)")
-plot(simDates, main="Arrival (cal BP)")
+plotSpeed(1/costRaster)
+plotMap(simDates)
