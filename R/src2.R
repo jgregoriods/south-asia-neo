@@ -18,6 +18,8 @@ coast <- readOGR("layers/ocean.shp")
 #cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 #DATES$bp <- medCal(cal)
 
+ELE_RAW <- raster("layers/ele.tif")
+RIV_RAW <- raster("layers/riv.tif")
 TEMP_RAW <- raster("layers/temp_cold.tif")
 PREC_RAW <- raster("layers/prec.tif")
 
@@ -27,13 +29,11 @@ normRaster <- function(x) {
 }
 
 
-# Transform and scale
-#ELE <- normRaster((ELE_RAW)^(1/3))
+ELE <- normRaster(ELE_RAW)
+RIV <- normRaster(RIV_RAW)
 TEMP <- normRaster(TEMP_RAW)
 
-# Remove outliers and 0 (for log transform)
 PREC_RAW[values(PREC_RAW > quantile(PREC_RAW, .99))] <- quantile(PREC_RAW, .99)
-#PREC <- normRaster(log(PREC_RAW + 1))
 PREC <- normRaster(PREC_RAW)
 
 
@@ -85,16 +85,16 @@ mutate <- function(x) {
     return(x)
 }
 
-numGenomes <- 100
-numParents <- 50
-numElite <- 10
+numGenomes <- 200
+numParents <- 100
+numElite <- 20
 mutationRate <- 0.1
-numIter <- 20
+numIter <- 50
 
 # Initialize genomes
-genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=4))
+genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=6))
 for (i in 1:numGenomes) {
-    genomes[i,] <- c(rnorm(3), Inf)
+    genomes[i,] <- c(rnorm(5), Inf)
 }
 
 maxScores <- c()
@@ -103,7 +103,7 @@ avgScores <- c()
 ncores <- detectCores() - 1
 cl <- makeCluster(ncores)
 clusterEvalQ(cl, library("gdistance"))
-clusterExport(cl, varlist=c("TEMP", "PREC", "ORIGIN", "START", "DATES",
+clusterExport(cl, varlist=c("ELE", "RIV", "TEMP", "PREC", "ORIGIN", "START", "DATES",
                             "testModel", "simulateDispersal"),
                             envir=environment())
 
@@ -115,10 +115,10 @@ for (iter in 1:numIter) {
     genomeList <- split(genomes, seq(nrow(genomes)))
 
     res <- parLapply(cl, genomeList, function(x) {
-        if (x[1,4] != Inf) {
-            return (x[1,4])
+        if (x[1,6] != Inf) {
+            return (x[1,6])
         } else {
-            cost <- (TEMP * x[1,1]) + (PREC * x[1,2]) + x[1,3]
+            cost <- (ELE * x[1,1]) + (RIV * x[1,2]) + (TEMP * x[1,3]) + (PREC * x[1,4]) + x[1,5]
             if (min(values(cost), na.rm=T) <= 0) {
                 return(Inf)
             } else {
@@ -129,25 +129,25 @@ for (iter in 1:numIter) {
         }
     })
 
-    genomes[,4] <- unlist(res)
+    genomes[,6] <- unlist(res)
 
-    avgScores[iter] <- mean(genomes[,4][!is.infinite(genomes[,4])])
+    avgScores[iter] <- mean(genomes[,6][!is.infinite(genomes[,6])])
 
-    elite <- genomes[order(genomes[,4]),][1:numElite,]
-    parents <- genomes[order(genomes[,4]),][1:numParents,]
+    elite <- genomes[order(genomes[,6]),][1:numElite,]
+    parents <- genomes[order(genomes[,6]),][1:numParents,]
     parents <- parents[order(as.numeric(rownames(parents))),]
 
-    maxScores[iter] <- elite[1,4]
+    maxScores[iter] <- elite[1,6]
 
-    children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=4))
+    children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=6))
     j <- 1
     while (j <= numGenomes - numElite) {
         for (i in seq(1, numParents - 1, 2)) {
             if (j > numGenomes - numElite) {
                 break
             }
-            parent1 <- as.numeric(parents[i,])[1:3]
-            parent2 <- as.numeric(parents[i+1,])[1:3]
+            parent1 <- as.numeric(parents[i,])[1:5]
+            parent2 <- as.numeric(parents[i+1,])[1:5]
             child <- crossover(parent1, parent2)
             if (runif(1) < mutationRate) {
                 child <- mutate(child)
@@ -179,16 +179,16 @@ plotSpeed <- function(r) {
     ext <- extent(r)
     plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),
          main="Simulated speed (km/yr)", xlab="Long", ylab="Lat")
-    contour(r, add=T, levels=seq(0, max(values(r), na.rm=T), 0.1))
+    #contour(r, add=T, levels=seq(0, max(values(r), na.rm=T), 0.1))
     plot(coast, add=T, lwd=1.5)
 }
 
 
 best <- as.numeric(genomes[1,])
-costRaster <- ((TEMP * best[1]) + (PREC * best[2]) + best[3])
+costRaster <- ((ELE * best[1]) + (RIV * best[2]) + (TEMP * best[3]) + (PREC * best[4]) + best[5])
 simDates <- simulateDispersal(costRaster, ORIGIN, START)
 
-cat(paste("Best score:", best[4], "\n"))
+cat(paste("Best score:", best[6], "\n"))
 write.csv(genomes, "results.csv")
 
 par(mfrow=c(2,2))
@@ -203,3 +203,5 @@ compareDates(simDates, DATES)
 
 plotSpeed(1/costRaster)
 plotMap(simDates)
+
+save(genomes, avgScores, maxScores, file="ga.RData")
