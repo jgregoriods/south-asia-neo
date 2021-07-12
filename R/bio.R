@@ -18,7 +18,7 @@ coast <- readOGR("layers/ocean.shp")
 #cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 #DATES$bp <- medCal(cal)
 
-BIOMES <- raster("layers/biomes.tif")
+BIOMES <- raster("layers/biomes3.tif")
 
 
 normRaster <- function(x) {
@@ -64,11 +64,12 @@ testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {
 
 reclassRaster <- function(r, vals) {
     r.new <- r
-    r.new[values(r) == 1] <- vals[1]    # tropical
-    r.new[values(r) == 4] <- vals[2]    # temperate
-    r.new[values(r) == 8] <- vals[3]    # grass
-    r.new[values(r) == 10] <- vals[4]   # montane
-    r.new[values(r) == 13] <- vals[5]   # desert
+    #codes <- c(1,4,8,10,13)
+    #codes <- c(1,4,9,13)
+    codes <- c(1,2,4,5,6,9,11,12,13,18,19,21)
+    for (i in 1:length(codes)) {
+        r.new[values(r) == codes[i]] <- vals[i]
+    }
     return (r.new)
 }
 
@@ -86,84 +87,87 @@ mutate <- function(x) {
     return(x)
 }
 
-numGenomes <- 200
-numParents <- 100
-numElite <- 20
-mutationRate <- 0.1
-numIter <- 20
-
-# Initialize genomes
-genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=6))
-for (i in 1:numGenomes) {
-    genomes[i,] <- c(rnorm(5, mean=1), Inf)
-}
-
-maxScores <- c()
-avgScores <- c()
-
-ncores <- detectCores() - 1
-cl <- makeCluster(ncores)
-clusterEvalQ(cl, library("gdistance"))
-clusterExport(cl, varlist=c("BIOMES", "ORIGIN", "START", "DATES", "reclassRaster",
-                            "testModel", "simulateDispersal"),
-                            envir=environment())
-
-cat(paste("\nRunning genetic algorithm on", ncores,
-          "parallel workers.\nThis may take a while...\n"))
-pb <- txtProgressBar(min=0, max=numIter, style=3)
-setTxtProgressBar(pb, 0)
-for (iter in 1:numIter) {
-    genomeList <- split(genomes, seq(nrow(genomes)))
-
-    res <- parLapply(cl, genomeList, function(x) {
-        if (x[1,6] != Inf) {
-            return (x[1,6])
-        } else {
-            cost <- reclassRaster(BIOMES, as.numeric(x[1,1:5]))
-            if (min(values(cost), na.rm=T) <= 0) {
-                return(Inf)
-            } else {
-                score <- testModel(cost)
-                gc()
-                return(score)
-            }
-        }
-    })
-
-    genomes[,6] <- unlist(res)
-
-    avgScores[iter] <- mean(genomes[,6][!is.infinite(genomes[,6])])
-
-    elite <- genomes[order(genomes[,6]),][1:numElite,]
-    parents <- genomes[order(genomes[,6]),][1:numParents,]
-    parents <- parents[order(as.numeric(rownames(parents))),]
-
-    maxScores[iter] <- elite[1,6]
-
-    children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=6))
-    j <- 1
-    while (j <= numGenomes - numElite) {
-        for (i in seq(1, numParents - 1, 2)) {
-            if (j > numGenomes - numElite) {
-                break
-            }
-            parent1 <- as.numeric(parents[i,])[1:5]
-            parent2 <- as.numeric(parents[i+1,])[1:5]
-            child <- crossover(parent1, parent2)
-            if (runif(1) < mutationRate) {
-                child <- mutate(child)
-            }
-            children[j,] <- c(child, Inf)
-            j <- j+1
-        }
+GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=NULL) {
+    # Initialize genomes
+    genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))
+    for (i in 1:numGenomes) {
+        genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)
     }
-    genomes <- rbind(elite, children)
-    rownames(genomes) <- sample(1:numGenomes)
-    setTxtProgressBar(pb, iter)
-}
-close(pb)
 
-stopCluster(cl)
+    maxScores <- c()
+    avgScores <- c()
+
+    if (is.null(cores)) {
+        ncores <- detectCores() - 1
+    } else {
+        ncores <- cores
+    }
+
+    cl <- makeCluster(ncores)
+    clusterEvalQ(cl, library("gdistance"))
+    clusterExport(cl, varlist=c("BIOMES", "ORIGIN", "START", "DATES", "reclassRaster",
+                                "testModel", "simulateDispersal"),
+                                envir=environment())
+
+    cat(paste("\nRunning genetic algorithm on", ncores,
+            "parallel workers.\nThis may take a while...\n"))
+    pb <- txtProgressBar(min=0, max=numIter, style=3)
+    setTxtProgressBar(pb, 0)
+    for (iter in 1:numIter) {
+        genomeList <- split(genomes, seq(nrow(genomes)))
+
+        res <- parLapply(cl, genomeList, function(x) {
+            if (x[1,numGenes+1] != Inf) {
+                return (x[1,numGenes+1])
+            } else {
+                if (min(x[1,1:numGenes]) <= 0) {
+                    return(Inf)
+                } else {
+                    cost <- reclassRaster(BIOMES, as.numeric(x[1,1:numGenes]))
+                    score <- testModel(cost)
+                    gc()
+                    return(score)
+                }
+            }
+        })
+
+        genomes[,numGenes+1] <- unlist(res)
+
+        avgScores[iter] <- mean(genomes[,numGenes+1][!is.infinite(genomes[,numGenes+1])])
+
+        elite <- genomes[order(genomes[,numGenes+1]),][1:numElite,]
+        parents <- genomes[order(genomes[,numGenes+1]),][1:numParents,]
+        parents <- parents[order(as.numeric(rownames(parents))),]
+
+        maxScores[iter] <- elite[1,numGenes+1]
+
+        children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=numGenes+1))
+        j <- 1
+        while (j <= numGenomes - numElite) {
+            for (i in seq(1, numParents - 1, 2)) {
+                if (j > numGenomes - numElite) {
+                    break
+                }
+                parent1 <- as.numeric(parents[i,])[1:numGenes]
+                parent2 <- as.numeric(parents[i+1,])[1:numGenes]
+                child <- crossover(parent1, parent2)
+                if (runif(1) < mutationRate) {
+                    child <- mutate(child)
+                }
+                children[j,] <- c(child, Inf)
+                j <- j+1
+            }
+        }
+        genomes <- rbind(elite, children)
+        rownames(genomes) <- sample(1:numGenomes)
+        setTxtProgressBar(pb, iter)
+    }
+    close(pb)
+
+    stopCluster(cl)
+
+    return (list(genomes=genomes, maxScores=maxScores, avgScores=avgScores))
+}
 
 
 plotMap <- function(r) {
@@ -185,17 +189,27 @@ plotSpeed <- function(r) {
 }
 
 
-best <- as.numeric(genomes[1,])
-costRaster <- reclassRaster(BIOMES, best[1:5])
+numGenes <- 12
+
+numGenomes <- 50
+numParents <- 20
+numElite <- 5
+mutationRate <- 0.1
+numIter <- 20
+
+res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter)
+
+best <- as.numeric(res$genomes[1,])
+costRaster <- reclassRaster(BIOMES, best[1:numGenes])
 simDates <- simulateDispersal(costRaster, ORIGIN, START)
 
-cat(paste("Best score:", best[6], "\n"))
-write.csv(genomes, "results.csv")
+cat(paste("Best score:", best[numGenes+1], "\n"))
+write.csv(res$genomes, "results.csv")
 
 par(mfrow=c(2,2))
-plot(avgScores, col="blue", main="RMSE", ylim=c(min(maxScores), max(avgScores)),
+plot(res$avgScores, col="blue", main="RMSE", ylim=c(min(res$maxScores), max(res$avgScores)),
      pch=0, type="b", ylab="RMSE", xlab="Generation")
-lines(maxScores, col="red", pch=0, type="b")
+lines(res$maxScores, col="red", pch=0, type="b")
 legend("topright", legend = c("Avg score", "Best score"),
        col = c("blue", "red"), lty = 1:1)
 
@@ -205,4 +219,7 @@ compareDates(simDates, DATES)
 plotSpeed(1/costRaster)
 plotMap(simDates)
 
-save(genomes, avgScores, maxScores, file="ga.RData")
+save(res, file="ga999.RData")
+
+# scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/ga.RData ga1.RData
+# scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/results.csv results1.csv
