@@ -18,7 +18,7 @@ coast <- readOGR("layers/ocean.shp")
 #cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 #DATES$bp <- medCal(cal)
 
-BIOMES <- raster("layers/biomes3.tif")
+BIOMES <- raster("layers/biomesIndus.tif")
 
 
 normRaster <- function(x) {
@@ -64,9 +64,10 @@ testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {
 
 reclassRaster <- function(r, vals) {
     r.new <- r
+    codes <- c(1,4,8,10,13,100)
     #codes <- c(1,4,8,10,13)
     #codes <- c(1,4,9,13)
-    codes <- c(1,2,4,5,6,9,11,12,13,18,19,21)
+    #codes <- c(1,2,4,5,6,9,11,12,13,18,19,21)
     for (i in 1:length(codes)) {
         r.new[values(r) == codes[i]] <- vals[i]
     }
@@ -111,8 +112,8 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
 
     cat(paste("\nRunning genetic algorithm on", ncores,
             "parallel workers.\nThis may take a while...\n"))
-    pb <- txtProgressBar(min=0, max=numIter, style=3)
-    setTxtProgressBar(pb, 0)
+    #pb <- txtProgressBar(min=0, max=numIter, style=3)
+    #setTxtProgressBar(pb, 0)
     for (iter in 1:numIter) {
         genomeList <- split(genomes, seq(nrow(genomes)))
 
@@ -160,9 +161,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
         }
         genomes <- rbind(elite, children)
         rownames(genomes) <- sample(1:numGenomes)
-        setTxtProgressBar(pb, iter)
+        #setTxtProgressBar(pb, iter)
+        cat("\r", floor(iter / numIter * 100), "%\tAvg score:", avgScores[iter])
     }
-    close(pb)
+    cat("\n")
+    #close(pb)
 
     stopCluster(cl)
 
@@ -189,11 +192,11 @@ plotSpeed <- function(r) {
 }
 
 
-numGenes <- 12
+numGenes <- 6
 
-numGenomes <- 50
-numParents <- 20
-numElite <- 5
+numGenomes <- 500
+numParents <- 200
+numElite <- 50
 mutationRate <- 0.1
 numIter <- 20
 
@@ -219,7 +222,7 @@ compareDates(simDates, DATES)
 plotSpeed(1/costRaster)
 plotMap(simDates)
 
-save(res, file="ga999.RData")
+save(res, file="ga.RData")
 
-# scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/ga.RData ga1.RData
+# scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/south-asia-neo/Rplots.pdf Rplots.pdf
 # scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/results.csv results1.csv
