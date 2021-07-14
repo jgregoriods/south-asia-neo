@@ -207,7 +207,7 @@ costRaster <- reclassRaster(BIOMES, best[1:numGenes])
 simDates <- simulateDispersal(costRaster, ORIGIN, START)
 
 cat(paste("Best score:", best[numGenes+1], "\n"))
-write.csv(res$genomes, "results.csv")
+write.csv(res$genomes, "results1407.csv")
 
 par(mfrow=c(2,2))
 plot(res$avgScores, col="blue", main="RMSE", ylim=c(min(res$maxScores), max(res$avgScores)),
@@ -222,7 +222,7 @@ compareDates(simDates, DATES)
 plotSpeed(1/costRaster)
 plotMap(simDates)
 
-save(res, file="ga.RData")
+save(res, file="ga1407.RData")
 
 # scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/south-asia-neo/Rplots.pdf Rplots.pdf
 # scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/results.csv results1.csv
