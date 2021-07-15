@@ -18,7 +18,7 @@ coast <- readOGR("layers/ocean.shp")
 #cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 #DATES$bp <- medCal(cal)
 
-BIOMES <- raster("layers/biomesIndus.tif")
+BIOMES <- raster("layers/newBiomes.tif")
 
 
 normRaster <- function(x) {
@@ -64,7 +64,8 @@ testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {
 
 reclassRaster <- function(r, vals) {
     r.new <- r
-    codes <- c(1,4,8,10,13,100)
+    codes <- 1:6
+    #codes <- c(1,4,8,10,13,100)
     #codes <- c(1,4,8,10,13)
     #codes <- c(1,4,9,13)
     #codes <- c(1,2,4,5,6,9,11,12,13,18,19,21)
@@ -194,9 +195,9 @@ plotSpeed <- function(r) {
 
 numGenes <- 6
 
-numGenomes <- 500
-numParents <- 200
-numElite <- 50
+numGenomes <- 100
+numParents <- 50
+numElite <- 10
 mutationRate <- 0.1
 numIter <- 20
 
