@@ -6,6 +6,8 @@ suppressPackageStartupMessages({
     library(viridis)
 })
 
+set.seed(100)
+
 ORIGIN <- c(42.45, 36.37)
 START <- 11748
 DATES <- read.csv("sites/dates100.csv")
@@ -195,9 +197,9 @@ plotSpeed <- function(r) {
 
 numGenes <- 6
 
-numGenomes <- 100
-numParents <- 50
-numElite <- 10
+numGenomes <- 200
+numParents <- 100
+numElite <- 20
 mutationRate <- 0.1
 numIter <- 20
 
