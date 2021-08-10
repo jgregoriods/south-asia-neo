@@ -4,6 +4,7 @@ suppressPackageStartupMessages({
     library(rgdal)
     library(parallel)
     library(viridis)
+    library(RColorBrewer)
 })
 
 set.seed(100)
@@ -20,7 +21,7 @@ coast <- readOGR("layers/ocean.shp")
 #cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 #DATES$bp <- medCal(cal)
 
-BIOMES <- raster("layers/newBiomes.tif")
+BIOMES <- raster("layers/newBiomes2.tif")
 
 
 normRaster <- function(x) {
@@ -47,7 +48,7 @@ compareDates <- function(simRaster, dates) {
     x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)
     y <- predict(model, newdata=data.frame(dist=x))
 
-    plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="cal BP", pch=20)
+    plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="Age (cal BP)", pch=20)
     points(dates$dist, dates$simbp, col=4, pch=20)
     lines(x, y, col=4)
 }
@@ -179,10 +180,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
 plotMap <- function(r) {
     ext <- extent(r)
     plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),
-         main="Simulated arrival times (cal BP)", xlab="Long", ylab="Lat")
+         main="Simulated arrival times", xlab="Longitude", ylab="Latitude",
+         legend.args=list(text="Age (yr BP)", side=2, font=1))
     minDate <- floor(min(values(r), na.rm=T) / 1000) * 1000
-    contour(r, add=T, levels=seq(minDate, max(values(r), na.rm=T), 1000))
-    plot(coast, add=T, lwd=1.5)
+    contour(r, add=T, levels=seq(minDate, max(values(r), na.rm=T), 1000), col="white", lwd=1)
+    plot(coast, add=T, lwd=1, col="lightgrey")
 }
 
 

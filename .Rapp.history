@@ -1,0 +1,441 @@
+plot(x, y)
+g <- glm(y~x)
+g
+summary(g)
+plot(x, y)
+lines(g)
+p <- predict(g, x)
+p <- predict(g)
+p
+plot(x,y)
+lines(p)
+plot(p)
+x
+plot(x,y)
+p <- predict(g, 100*4:11)
+g <- glm(y~x, family=binomial)
+g <- glm(y~x, family=binomial())
+g
+summary(g)
+d <- data.frame(y=y, x=x)
+d
+g <- glm(y~., family=binomial, data=d)
+d <- rbind(d, c(0, 600))
+d <- rbind(d, c(1, 1010))
+d
+d <- rbind(d, c(1, 1110))
+d <- rbind(d, c(1, 990))
+d <- rbind(d, c(0, 300))
+d
+g <- glm(y~., family=binomial, data=d)
+plot(d)
+plot(x,y)
+plot(d$x,d$y)
+g <- glm(y~x, family=binomial, data=d)
+a = randnorm
+a = rnorm
+a = rnorm(100, 50)
+a
+a = rnorm(800, 98.5, 33.7)
+plot(hist(a))
+plot(density(a))
+a
+mean(a)
+do_sample <- function(x) {}
+do_sample <- function(x) {
+do_sample <- function(x, n) {
+for (i in 1:n) {
+do_sample <- function(x, n) {
+l = c()
+for (i in 1:n) {
+l <- cbind(l, mean(sample(x, size=50, replace=F)))
+}}
+do_sample <- function(x, n) {
+l = c()
+l <- cbind(l, mean(sample(x, size=50, replace=F)))
+}
+return(l) }
+do_sample <- function(x, n) {
+l = c()
+for (i in 1:n) {
+l <- cbind(l, mean(sample(x, size=50, replace=F)))
+}
+return(l) }
+do_sample(a, 1)
+z <- do_sample(a, 10)
+plot(hist(z))
+z <- do_sample(a, 100)
+plot(hist(z))
+z <- do_sample(a, 1000)
+plot(hist(z))
+z
+mean(z)
+mean(a)
+z <- do_sample(a, 10000)
+mean(z)
+plot(z)
+plot(density(z))
+b <- sample(a, 80)
+b
+mean(b)
+sd(b)
+mean(a)
+(99.9 - 103.3079) / 36.29
+get_z_score <- function(xi, x) { return ((xi - mean(x)) / sd(x)) }
+get_z_score(99.9, b)
+for(i in 1:100) {
+get_z_score(99.9, sample(a, 80)) }
+for(i in 1:100) {
+print(get_z_score(99.9, sample(a, 80))) }
+print(get_z_score(99.9, sample(a, 5))) }
+for(i in 1:100) {
+print(get_z_score(99.9, sample(a, 8))) }
+1 + 1
+a <- 1
+x <- 100
+x
+y <- 50
+y
+x + y
+z <- x + y
+z
+a <- c(1,2,3,4,5,6,7)
+a
+b <- 10
+b
+a * b
+require(rcarbon)
+install.packages("spDates")
+install.packages("gDistance")
+install.packages("gdistance")
+library(gdistance)
+raster
+a <- raster("~/GIS/euro_test.tif")
+a <- raster("~/euro_test.tif")
+plot(a)
+tr <- transition(a, mean, directions=4)
+sp0 <- SpatialPoints(c(30,40))
+sp0 <- SpatialPoints(cbind(30,40))
+plot(a)
+plot(sp0, add=T)
+cd <- costDistance(tr, sp0)
+cd
+tr
+plot(tr)
+tr <- geoCorrection(tr, type="c")
+cd <- costDistance(tr, sp0)
+cd
+ac <- accCost(tr, sp0)
+ac
+plot(ac)
+max(values(ac))
+writeRaster(ac, "test.asc")
+tr <- transition(a, mean, directions=8)
+tr <- geoCorrection(tr, type="c")
+cd <- costDistance(tr, sp0)
+ac <- accCost(tr, sp0)
+plot(ac)
+writeRaster(ac, "test.asc", overwrite=T)
+plot(5000-(ac*1.78))
+plot(5000-(ac/1.78))
+plot(5000-(ac/1000/1.78))
+plot(5000-(ac/1000/1))
+plot(5000-(ac/1000/1.78))
+tr <- transition(a, function(x) 1/mean(x), directions=16)
+tr <- geoCorrection(tr, type="c")
+cd <- costDistance(tr, sp0)
+ac <- accCost(tr, sp0)
+plot(ac)
+writeRaster(ac, "test.asc", overwrite=T)
+plot(ac)
+tr <- transition(a, function(x) 1/mean(x), directions=8)
+tr <- geoCorrection(tr)
+ac <- accCost(tr, sp0)
+plot(ac)
+writeRaster(ac, "test.asc", overwrite=T)
+plot(ac)
+sp0
+sp0 <- SpatialPoints(cbind(c(30,10,40,50)))
+sp0 <- SpatialPoints(cbind(c(30,40), c(10,50)))
+plot(sp0)
+plot(ac)
+plot(sp0, add=T)
+sp0 <- SpatialPoints(cbind(c(30,40)))
+sp0 <- SpatialPoints(cbind(c(30,40))
+sp0 <- SpatialPoints(cbind(c(10,30), c(50,40)))
+plot(ac)
+plot(sp0, add=T)
+ac <- accCost(tr, sp0)
+plot(ac)
+sp0 <- SpatialPoints(cbind(30,40))
+sp1 <- SpatialPoints(cbind(10,50))
+ac1 <- accCost(tr, sp0)
+ac0 <- accCost(tr, sp0)
+ac1 <- accCost(tr, sp1)
+plot(ac1)
+bac0 <- 5000 - (ac0 / 1000 / 1.78)
+plot(bac0)
+bac1 <- 3000 - (ac1 / 1000 / 1.78)
+plot(bac1)
+plot(max(bac0, bac1))
+plot(bac0)
+plot(bac1)
+plot(layerStats(stack(bac0, bac1), stat=max))
+plot(layerStats(stack(bac0, bac1), stat="max"))
+plot(max(values(bac0), values(bac1)))
+plot(max(stack(bac0, bac1)))
+plot(bac0)
+plot(bac1)
+plot(bac0)
+bac1 <- 4000 - (ac1 / 1000 / 1.78)
+plot(max(stack(bac0, bac1)))
+library(viridisLite)
+plot(max(stack(bac0, bac1)), color=viridis)
+plot(max(stack(bac0, bac1)), color=viridis())
+plot(max(stack(bac0, bac1)), color=viridis(10))
+plot(max(stack(bac0, bac1)), color=viridis(9))
+warnings()
+plot(max(stack(bac0, bac1)), c=viridis(9))
+plot(max(stack(bac0, bac1)), color=viridis(9))
+plot(max(stack(bac0, bac1)), col=viridis(9))
+plot(max(stack(bac0, bac1)), col=viridis(8))
+plot(max(stack(bac0, bac1)), col=viridis(7))
+plot(max(stack(bac0, bac1)), col=viridis(6))
+plot(max(stack(bac0, bac1)), col=viridis(5))
+plot(max(stack(bac0, bac1)), col=viridis(4))
+plot(max(stack(bac0, bac1)), col=viridis(3))
+plot(max(stack(bac0, bac1)), col=viridis(10))
+bac1 <- 4500 - (ac1 / 1000 / 1.78)
+plot(max(stack(bac0, bac1)), col=viridis(10))
+plot(max(stack(bac0, bac1)), col=viridis(12))
+plot(max(stack(bac0, bac1)), col=viridis(9))
+plot(max(stack(bac0, bac1)), col=viridis(5))
+plot(max(stack(bac0, bac1)), col=viridis(12))
+plot(max(stack(bac0, bac1)), col=viridis(15))
+plot(max(stack(bac0, bac1)), col=viridis(33))
+a
+plot(a)
+b <- a
+b[values(b) == 1] <- 0
+plot(b)
+tr <- transition(b, function(x) 1/mean(x), directions=8)
+tr <- geoCorrection(tr)
+bac0 <- 5000 - (ac0 / 1000 / 1.78)
+plot(bac0)
+ac0 <- accCost(tr, sp0)
+plot(ac)
+plot(ac0)
+rnorm
+rexp
+rexp(1, 1)
+rexp()
+rexp(1000, 1)
+hist(rexp(1000, 1))
+hist(1000 + rexp(1000, 1))
+hist(1000 + rexp(1000, 10))
+hist(1000 + rexp(1000, -1))
+hist(1000 + rexp(1000, 0.1))
+hist(1000 + rexp(-1000, 0.1))
+hist(rexp(1000, -1))
+hist(rexp(1000, 0.5))
+hist(rexp(1000, 1))
+install.packages("rnaturalearth")
+setwd("south-asia-neo/")
+suppressPackageStartupMessages({#
+    library(gdistance)#
+    #library(rcarbon)#
+    library(rgdal)#
+    library(parallel)#
+    library(viridis)#
+    library(RColorBrewer)#
+})#
+#
+set.seed(100)#
+#
+ORIGIN <- c(42.45, 36.37)#
+START <- 11748#
+DATES <- read.csv("sites/dates100.csv")#
+coordinates(DATES) <- ~Longitude+Latitude#
+proj4string(DATES) <- CRS("+init=epsg:4326")#
+#
+#coast <- ne_download(scale=10, type="coastline", category="physical")#
+coast <- readOGR("layers/ocean.shp")#
+#
+#cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)#
+#DATES$bp <- medCal(cal)#
+#
+BIOMES <- raster("layers/newBiomes2.tif")#
+normRaster <- function(x) {#
+    return ((x - min(values(x), na.rm=TRUE)) / (max(values(x), na.rm=TRUE) - min(values(x), na.rm=TRUE)))#
+}#
+simulateDispersal <- function(costRaster, origin, date) {#
+    tr <- transition(costRaster, function(x) 1 / mean(x), 16)#
+    tr <- geoCorrection(tr)#
+    ac <- accCost(tr, origin)#
+    ac <- ac / 1000#
+    ac[values(ac) == Inf] <- NA#
+    simDates <- date - ac#
+    return(simDates)#
+}#
+compareDates <- function(simRaster, dates) {#
+    dates$simbp <- extract(simRaster, dates)#
+    dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)#
+#
+    model <- lm(simbp~poly(dist, 2), data=dates)#
+    x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)#
+    y <- predict(model, newdata=data.frame(dist=x))#
+#
+    plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="Age (cal BP)", pch=20)#
+    points(dates$dist, dates$simbp, col=4, pch=20)#
+    lines(x, y, col=4)#
+}#
+testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {#
+    simDates <- simulateDispersal(costRaster, origin, date)#
+    gc() #
+    # Score#
+    sites$simbp <- extract(simDates, sites)#
+    sites <- sites[!is.na(sites$simbp),]#
+    rmse <- sqrt(sum((sites$simbp - sites$bp)^2) / nrow(sites))#
+    return(rmse)#
+}#
+reclassRaster <- function(r, vals) {#
+    r.new <- r#
+    codes <- 1:6#
+    #codes <- c(1,4,8,10,13,100)#
+    #codes <- c(1,4,8,10,13)#
+    #codes <- c(1,4,9,13)#
+    #codes <- c(1,2,4,5,6,9,11,12,13,18,19,21)#
+    for (i in 1:length(codes)) {#
+        r.new[values(r) == codes[i]] <- vals[i]#
+    }#
+    return (r.new)#
+}#
+# Genetic Algorithm#
+#
+crossover <- function(x, y) {#
+    i <- sample(1:(length(x)-1), 1)#
+    return(c(x[1:i], y[(i+1):length(y)]))#
+}#
+#
+mutate <- function(x) {#
+    i <- sample(1:length(x), 1)#
+    x[i] <- x[i] + rnorm(1)#
+    return(x)#
+}#
+#
+GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=NULL) {#
+    # Initialize genomes#
+    genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))#
+    for (i in 1:numGenomes) {#
+        genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)#
+    }#
+#
+    maxScores <- c()#
+    avgScores <- c()#
+#
+    if (is.null(cores)) {#
+        ncores <- detectCores() - 1#
+    } else {#
+        ncores <- cores#
+    }#
+#
+    cl <- makeCluster(ncores)#
+    clusterEvalQ(cl, library("gdistance"))#
+    clusterExport(cl, varlist=c("BIOMES", "ORIGIN", "START", "DATES", "reclassRaster",#
+                                "testModel", "simulateDispersal"),#
+                                envir=environment())#
+#
+    cat(paste("\nRunning genetic algorithm on", ncores,#
+            "parallel workers.\nThis may take a while...\n"))#
+    #pb <- txtProgressBar(min=0, max=numIter, style=3)#
+    #setTxtProgressBar(pb, 0)#
+    for (iter in 1:numIter) {#
+        genomeList <- split(genomes, seq(nrow(genomes)))#
+#
+        res <- parLapply(cl, genomeList, function(x) {#
+            if (x[1,numGenes+1] != Inf) {#
+                return (x[1,numGenes+1])#
+            } else {#
+                if (min(x[1,1:numGenes]) <= 0) {#
+                    return(Inf)#
+                } else {#
+                    cost <- reclassRaster(BIOMES, as.numeric(x[1,1:numGenes]))#
+                    score <- testModel(cost)#
+                    gc()#
+                    return(score)#
+                }#
+            }#
+        })#
+#
+        genomes[,numGenes+1] <- unlist(res)#
+#
+        avgScores[iter] <- mean(genomes[,numGenes+1][!is.infinite(genomes[,numGenes+1])])#
+#
+        elite <- genomes[order(genomes[,numGenes+1]),][1:numElite,]#
+        parents <- genomes[order(genomes[,numGenes+1]),][1:numParents,]#
+        parents <- parents[order(as.numeric(rownames(parents))),]#
+#
+        maxScores[iter] <- elite[1,numGenes+1]#
+#
+        children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=numGenes+1))#
+        j <- 1#
+        while (j <= numGenomes - numElite) {#
+            for (i in seq(1, numParents - 1, 2)) {#
+                if (j > numGenomes - numElite) {#
+                    break#
+                }#
+                parent1 <- as.numeric(parents[i,])[1:numGenes]#
+                parent2 <- as.numeric(parents[i+1,])[1:numGenes]#
+                child <- crossover(parent1, parent2)#
+                if (runif(1) < mutationRate) {#
+                    child <- mutate(child)#
+                }#
+                children[j,] <- c(child, Inf)#
+                j <- j+1#
+            }#
+        }#
+        genomes <- rbind(elite, children)#
+        rownames(genomes) <- sample(1:numGenomes)#
+        #setTxtProgressBar(pb, iter)#
+        cat("\r", floor(iter / numIter * 100), "%\tAvg score:", avgScores[iter])#
+    }#
+    cat("\n")#
+    #close(pb)#
+#
+    stopCluster(cl)#
+#
+    return (list(genomes=genomes, maxScores=maxScores, avgScores=avgScores))#
+}#
+plotMap <- function(r) {#
+    ext <- extent(r)#
+    plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),#
+         main="Simulated arrival times", xlab="Longitude", ylab="Latitude",#
+         legend.args=list(text="Age (yr BP)", side=2, font=1))#
+    minDate <- floor(min(values(r), na.rm=T) / 1000) * 1000#
+    contour(r, add=T, levels=seq(minDate, max(values(r), na.rm=T), 1000), col="white", lwd=1)#
+    plot(coast, add=T, lwd=1, col="lightgrey")#
+}#
+plotSpeed <- function(r) {#
+    ext <- extent(r)#
+    plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),#
+         main="Simulated speed (km/yr)", xlab="Long", ylab="Lat")#
+    #contour(r, add=T, levels=seq(0, max(values(r), na.rm=T), 0.1))#
+    plot(coast, add=T, lwd=1.5)#
+}#
+numGenes <- 6#
+#
+numGenomes <- 200#
+numParents <- 100#
+numElite <- 20#
+mutationRate <- 0.1#
+numIter <- 20
+load("ga0908.RData")
+best <- as.numeric(res$genomes[1,])#
+costRaster <- reclassRaster(BIOMES, best[1:numGenes])#
+simDates <- simulateDispersal(costRaster, ORIGIN, START)
+BIOMES <- raster("layers/newBiomes2.tif")
+BIOMES <- raster("newBiomes2.tif")
+best <- as.numeric(res$genomes[1,])#
+costRaster <- reclassRaster(BIOMES, best[1:numGenes])#
+simDates <- simulateDispersal(costRaster, ORIGIN, START)
+plotMap(simDates)
