@@ -5,6 +5,8 @@ suppressPackageStartupMessages({
     library(parallel)
     library(viridis)
     library(RColorBrewer)
+    library(pals)
+    library(rasterVis)
 })
 
 set.seed(100)
@@ -210,6 +212,7 @@ res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter)
 best <- as.numeric(res$genomes[1,])
 costRaster <- reclassRaster(BIOMES, best[1:numGenes])
 simDates <- simulateDispersal(costRaster, ORIGIN, START)
+simDates <- crop(simDates, extent(DATES))
 
 cat(paste("Best score:", best[numGenes+1], "\n"))
 write.csv(res$genomes, "results1407.csv")
@@ -231,3 +234,17 @@ save(res, file="ga1407.RData")
 
 # scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/south-asia-neo/Rplots.pdf Rplots.pdf
 # scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/results.csv results1.csv
+
+plotMap2 <- function(x) {
+    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000
+    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000
+    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))
+    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,
+              main=list("Simulated arrival times (yr BP)", cex=0.8)) +
+         layer(sp.polygons(coast, fill="lightgrey")) +
+         layer(sp.points(DATES, col="white", cex=0.3)) +
+         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5,
+                     labels=list(cex=0.5, col="white"), col="white")
+         #layer(sp.lines(ctr, lwd=0.75, col="white"))
+    return(p)
+};plotMap2(simDates)
