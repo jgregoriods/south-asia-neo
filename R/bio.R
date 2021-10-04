@@ -13,7 +13,7 @@ set.seed(100)
 
 ORIGIN <- c(42.45, 36.37)
 START <- 11748
-DATES <- read.csv("sites/dates100.csv")
+DATES <- read.csv("sites/dates.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- CRS("+init=epsg:4326")
 
