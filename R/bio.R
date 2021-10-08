@@ -9,7 +9,7 @@ suppressPackageStartupMessages({
     library(rasterVis)
 })
 
-set.seed(100)
+set.seed(123)
 
 ORIGIN <- c(42.45, 36.37)
 START <- 11748
@@ -23,7 +23,7 @@ coast <- readOGR("layers/ocean.shp")
 #cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 #DATES$bp <- medCal(cal)
 
-BIOMES <- raster("layers/newBiomes2.tif")
+BIOMES <- raster("layers/newBiomes_final.tif")
 
 
 normRaster <- function(x) {
@@ -201,9 +201,9 @@ plotSpeed <- function(r) {
 
 numGenes <- 6
 
-numGenomes <- 200
-numParents <- 100
-numElite <- 20
+numGenomes <- 500
+numParents <- 200
+numElite <- 50
 mutationRate <- 0.1
 numIter <- 20
 
@@ -215,7 +215,7 @@ simDates <- simulateDispersal(costRaster, ORIGIN, START)
 simDates <- crop(simDates, extent(DATES))
 
 cat(paste("Best score:", best[numGenes+1], "\n"))
-write.csv(res$genomes, "results1407.csv")
+write.csv(res$genomes, "results0810c.csv")
 
 par(mfrow=c(2,2))
 plot(res$avgScores, col="blue", main="RMSE", ylim=c(min(res$maxScores), max(res$avgScores)),
@@ -230,7 +230,7 @@ compareDates(simDates, DATES)
 plotSpeed(1/costRaster)
 plotMap(simDates)
 
-save(res, file="ga1407.RData")
+save(res, file="ga0810c.RData")
 
 # scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/south-asia-neo/Rplots.pdf Rplots.pdf
 # scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/results.csv results1.csv
