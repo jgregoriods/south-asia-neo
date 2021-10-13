@@ -207,6 +207,8 @@ numElite <- 50
 mutationRate <- 0.1
 numIter <- 20
 
+if (F) {
+
 res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter)
 
 best <- as.numeric(res$genomes[1,])
@@ -248,3 +250,5 @@ plotMap2 <- function(x) {
          #layer(sp.lines(ctr, lwd=0.75, col="white"))
     return(p)
 };plotMap2(simDates)
+
+}

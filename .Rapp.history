@@ -1,50 +1,3 @@
-for (i in 1:10000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)}
-sum(res <= 6)
-res <- c()
-for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)}
-sum(res <= 6)
-res <- c()
-for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)}
-sum(res <= 6)
-res <- c()
-for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)}
-sum(res <= 6)
-res <- c()
-for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)}
-sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602))
-res <- c()
-for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)}
-res <- c()
-for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)}
-sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380))
-res <- c();for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380, 94591))
-res <- c();for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380, 94591))
-mean(c(94536, 94584, 94455, 94602, 94380, 94591,94664))
-res <- c();for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380, 94591,94664,94583))
-res <- c();for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380, 94591,94664,94583,94511))
-res <- c();for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380, 94591,94664,94583,94511,94469))
-res <- c();for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380, 94591,94664,94583,94511,94469,94499))
-res <- c();for (i in 1:100000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-mean(c(94536, 94584, 94455, 94602, 94380, 94591,94664,94583,94511,94469,94499,94525))
-res <- c();for (i in 1:1000000) {x <- runif(1,3,8); y <- runif(1,0,x); res[i] <- min(x,y)};sum(res <= 6)
-i <- 1
-foo <- function() {i <- 1; n <- runif(1); while(n > 1/3) {i <- i+1}; return(i)}
-foo()
-foo <- function() {i <- 1; n <- runif(1); while(n > 1/3) {i <- i+1; n <- runif(1)}; return(i)}
-foo()
-res <- c()
-for (i in 1:1000) {res[i] <- foo()}
-res
-mean(res)
-res <- c()
 for (i in 1:1000) {res[i] <- foo()}
 mean(res)
 res <- c()
@@ -196,369 +149,140 @@ foo(2,2)
 d/0.1008188
 76*2
 76*3
-setwd("south-asia-neo/")
-suppressPackageStartupMessages({#
-    library(gdistance)#
-    #library(rcarbon)#
-    library(rgdal)#
-    library(parallel)#
-    library(viridis)#
-    library(RColorBrewer)#
-    library(pals)#
-    library(rasterVis)#
-})
-set.seed(100)#
-#
-ORIGIN <- c(42.45, 36.37)#
-START <- 11748#
-DATES <- read.csv("sites/dates100.csv")#
-coordinates(DATES) <- ~Longitude+Latitude#
-proj4string(DATES) <- CRS("+init=epsg:4326")#
-#
-#coast <- ne_download(scale=10, type="coastline", category="physical")#
-coast <- readOGR("layers/ocean.shp")#
-#
-#cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)#
-#DATES$bp <- medCal(cal)#
-#
-BIOMES <- raster("layers/newBiomes2.tif")#
-normRaster <- function(x) {#
-    return ((x - min(values(x), na.rm=TRUE)) / (max(values(x), na.rm=TRUE) - min(values(x), na.rm=TRUE)))#
-}#
-simulateDispersal <- function(costRaster, origin, date) {#
-    tr <- transition(costRaster, function(x) 1 / mean(x), 16)#
-    tr <- geoCorrection(tr)#
-    ac <- accCost(tr, origin)#
-    ac <- ac / 1000#
-    ac[values(ac) == Inf] <- NA#
-    simDates <- date - ac#
-    return(simDates)#
-}#
-compareDates <- function(simRaster, dates) {#
-    dates$simbp <- extract(simRaster, dates)#
-    dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)#
-#
-    model <- lm(simbp~poly(dist, 2), data=dates)#
-    x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)#
-    y <- predict(model, newdata=data.frame(dist=x))#
-#
-    plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="Age (cal BP)", pch=20)#
-    points(dates$dist, dates$simbp, col=4, pch=20)#
-    lines(x, y, col=4)#
-}#
-testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {#
-    simDates <- simulateDispersal(costRaster, origin, date)#
-    gc() #
-    # Score#
-    sites$simbp <- extract(simDates, sites)#
-    sites <- sites[!is.na(sites$simbp),]#
-    rmse <- sqrt(sum((sites$simbp - sites$bp)^2) / nrow(sites))#
-    return(rmse)#
-}#
-reclassRaster <- function(r, vals) {#
-    r.new <- r#
-    codes <- 1:6#
-    #codes <- c(1,4,8,10,13,100)#
-    #codes <- c(1,4,8,10,13)#
-    #codes <- c(1,4,9,13)#
-    #codes <- c(1,2,4,5,6,9,11,12,13,18,19,21)#
-    for (i in 1:length(codes)) {#
-        r.new[values(r) == codes[i]] <- vals[i]#
-    }#
-    return (r.new)#
-}#
-# Genetic Algorithm#
-#
-crossover <- function(x, y) {#
-    i <- sample(1:(length(x)-1), 1)#
-    return(c(x[1:i], y[(i+1):length(y)]))#
-}#
-#
-mutate <- function(x) {#
-    i <- sample(1:length(x), 1)#
-    x[i] <- x[i] + rnorm(1)#
-    return(x)#
-}#
-#
-GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=NULL) {#
-    # Initialize genomes#
-    genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))#
-    for (i in 1:numGenomes) {#
-        genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)#
-    }#
-#
-    maxScores <- c()#
-    avgScores <- c()#
-#
-    if (is.null(cores)) {#
-        ncores <- detectCores() - 1#
-    } else {#
-        ncores <- cores#
-    }#
-#
-    cl <- makeCluster(ncores)#
-    clusterEvalQ(cl, library("gdistance"))#
-    clusterExport(cl, varlist=c("BIOMES", "ORIGIN", "START", "DATES", "reclassRaster",#
-                                "testModel", "simulateDispersal"),#
-                                envir=environment())#
-#
-    cat(paste("\nRunning genetic algorithm on", ncores,#
-            "parallel workers.\nThis may take a while...\n"))#
-    #pb <- txtProgressBar(min=0, max=numIter, style=3)#
-    #setTxtProgressBar(pb, 0)#
-    for (iter in 1:numIter) {#
-        genomeList <- split(genomes, seq(nrow(genomes)))#
-#
-        res <- parLapply(cl, genomeList, function(x) {#
-            if (x[1,numGenes+1] != Inf) {#
-                return (x[1,numGenes+1])#
-            } else {#
-                if (min(x[1,1:numGenes]) <= 0) {#
-                    return(Inf)#
-                } else {#
-                    cost <- reclassRaster(BIOMES, as.numeric(x[1,1:numGenes]))#
-                    score <- testModel(cost)#
-                    gc()#
-                    return(score)#
-                }#
-            }#
-        })#
-#
-        genomes[,numGenes+1] <- unlist(res)#
-#
-        avgScores[iter] <- mean(genomes[,numGenes+1][!is.infinite(genomes[,numGenes+1])])#
-#
-        elite <- genomes[order(genomes[,numGenes+1]),][1:numElite,]#
-        parents <- genomes[order(genomes[,numGenes+1]),][1:numParents,]#
-        parents <- parents[order(as.numeric(rownames(parents))),]#
-#
-        maxScores[iter] <- elite[1,numGenes+1]#
-#
-        children <- as.data.frame(matrix(nrow=numGenomes - numElite, ncol=numGenes+1))#
-        j <- 1#
-        while (j <= numGenomes - numElite) {#
-            for (i in seq(1, numParents - 1, 2)) {#
-                if (j > numGenomes - numElite) {#
-                    break#
-                }#
-                parent1 <- as.numeric(parents[i,])[1:numGenes]#
-                parent2 <- as.numeric(parents[i+1,])[1:numGenes]#
-                child <- crossover(parent1, parent2)#
-                if (runif(1) < mutationRate) {#
-                    child <- mutate(child)#
-                }#
-                children[j,] <- c(child, Inf)#
-                j <- j+1#
-            }#
-        }#
-        genomes <- rbind(elite, children)#
-        rownames(genomes) <- sample(1:numGenomes)#
-        #setTxtProgressBar(pb, iter)#
-        cat("\r", floor(iter / numIter * 100), "%\tAvg score:", avgScores[iter])#
-    }#
-    cat("\n")#
-    #close(pb)#
-#
-    stopCluster(cl)#
-#
-    return (list(genomes=genomes, maxScores=maxScores, avgScores=avgScores))#
-}#
-plotMap <- function(r) {#
-    ext <- extent(r)#
-    plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),#
-         main="Simulated arrival times", xlab="Longitude", ylab="Latitude",#
-         legend.args=list(text="Age (yr BP)", side=2, font=1))#
-    minDate <- floor(min(values(r), na.rm=T) / 1000) * 1000#
-    contour(r, add=T, levels=seq(minDate, max(values(r), na.rm=T), 1000), col="white", lwd=1)#
-    plot(coast, add=T, lwd=1, col="lightgrey")#
-}#
-plotSpeed <- function(r) {#
-    ext <- extent(r)#
-    plot(r, xlim=c(ext[1], ext[2]), ylim=c(ext[3], ext[4]), col=viridis_pal()(255),#
-         main="Simulated speed (km/yr)", xlab="Long", ylab="Lat")#
-    #contour(r, add=T, levels=seq(0, max(values(r), na.rm=T), 0.1))#
-    plot(coast, add=T, lwd=1.5)#
-}#
-numGenes <- 6#
-#
-numGenomes <- 200#
-numParents <- 100#
-numElite <- 20#
-mutationRate <- 0.1#
-numIter <- 20
-load("ga0908.RData")
+a <- read.csv("joseLomas.csv")
+a
+a <- na.omit(a)
+a
+b <- data.frame(Inner=log(a$Core), Poly=log(a$Max))
+b
+b <- data.frame(Inner=log(a$Core), Poly=log(a$Max+1))
+b
+hist(a$Max)
+hist(a$Core)
+hist(log(a$Max+1))
+hist(log(a$Core))
+b
+k_max <- 5
+wss <- sapply(2:k_max, function(k){kmeans(b, k)$tot.withinss})
+wss
+plot(2:k_max, wss, type="b", xlab="Number of clusters", ylab="Total within-clusters sum of squares")
+plot(b)
+plot(a$Core, a$Max)
+plot(b)
+plot(2:k_max, wss, type="b", xlab="Number of clusters", ylab="Total within-clusters sum of squares")
+k_max <- 10
+wss <- sapply(2:k_max, function(k){kmeans(b, k)$tot.withinss})
+plot(2:k_max, wss, type="b", xlab="Number of clusters", ylab="Total within-clusters sum of squares")
+b
+Xs <- c(0.387, 0.723, 1.00, 1.52, 5.20, 9.54, 19.2, 30.1, 39.5)
+Ys <- c(0.241, 0.615, 1.00, 1.88, 11.9, 29.5, 84.0, 165.0, 248)
+plot(Xs,Ys)
+lm(Ys~Xs)
+m <- lm(Ys~Xs)
+m
+summary(m)
+m
+summary(m)
+plot(m)
+hist(Xs)
+hist(Ys)
+m <- lm(log(Ys)~Xs)
+summary(m)
+plot(Xs,log(Ys))
+plot(log(Xs),log(Ys))
+m <- lm(log(Ys)~log(Xs))
+summary(m)
+plot(m)
+exp(1.4995326)
+exp(log(3))
+round(1.56)
+round(1.56,2)
+round(1.4995,2)
+LogPlanetMass = c(-0.31471074,  1.01160091,  0.58778666,  0.46373402, -0.01005034,#
+         0.66577598, -1.30933332, -0.37106368, -0.40047757, -0.27443685,#
+         1.30833282, -0.46840491, -1.91054301,  0.16551444,  0.78845736,#
+        -2.43041846,  0.21511138,  2.29253476, -2.05330607, -0.43078292,#
+        -4.98204784, -0.48776035, -1.69298258, -0.08664781, -2.28278247,#
+         3.30431931, -3.27016912,  1.14644962, -3.10109279, -0.61248928)
+LogPlanetMass
+LogPlanetRadius <- c(0.32497786,  0.34712953,  0.14842001,  0.45742485,  0.1889661 ,#
+         0.06952606,  0.07696104,  0.3220835 ,  0.42918163, -0.05762911,#
+         0.40546511,  0.19227189, -0.16251893,  0.45107562,  0.3825376 ,#
+        -0.82098055,  0.10436002,  0.0295588 , -1.17921515,  0.55961579,#
+        -2.49253568,  0.11243543, -0.72037861,  0.36464311, -0.46203546,#
+         0.13976194, -2.70306266,  0.12221763, -2.41374014,  0.35627486)
+LogPlanetOrbit <- -2.63108916, -3.89026151, -3.13752628, -2.99633245, -3.12356565,#
+        -2.33924908, -2.8507665 , -3.04765735, -2.84043939, -3.19004544,#
+        -3.14655516, -3.13729584, -3.09887303, -3.09004295, -3.16296819,#
+        -2.3227878 , -3.77661837, -2.52572864, -4.13641734, -3.05018846,#
+        -2.40141145, -3.14795149, -0.40361682, -3.2148838 , -2.74575207,#
+        -3.70014265, -1.98923527, -3.35440922, -1.96897409, -2.99773428
+LogPlanetOrbit <- c(-2.63108916, -3.89026151, -3.13752628, -2.99633245, -3.12356565,#
+        -2.33924908, -2.8507665 , -3.04765735, -2.84043939, -3.19004544,#
+        -3.14655516, -3.13729584, -3.09887303, -3.09004295, -3.16296819,#
+        -2.3227878 , -3.77661837, -2.52572864, -4.13641734, -3.05018846,#
+        -2.40141145, -3.14795149, -0.40361682, -3.2148838 , -2.74575207,#
+        -3.70014265, -1.98923527, -3.35440922, -1.96897409, -2.99773428)
+StarMetallicity <- c(0.11 , -0.002, -0.4  ,  0.01 ,  0.15 ,  0.22 , -0.01 ,  0.02 ,#
+        -0.06 , -0.127,  0.   ,  0.12 ,  0.27 ,  0.09 , -0.077,  0.3  ,#
+         0.14 , -0.07 ,  0.19 , -0.02 ,  0.12 ,  0.251,  0.07 ,  0.16 ,#
+         0.19 ,  0.052, -0.32 ,  0.258,  0.02 , -0.17)
+LogStarMass <- c(0.27002714,  0.19144646, -0.16369609,  0.44468582,  0.19227189,#
+         0.01291623,  0.0861777 ,  0.1380213 ,  0.49469624, -0.43850496,#
+         0.54232429,  0.02469261,  0.07325046,  0.42133846,  0.2592826 ,#
+        -0.09431068, -0.24846136, -0.12783337, -0.07364654,  0.26159474,#
+         0.07603469, -0.07796154,  0.09440068,  0.07510747,  0.17395331,#
+         0.28893129, -0.21940057,  0.02566775, -0.09211529,  0.16551444)
+LogStarAge <- c(1.58103844,  1.06471074,  2.39789527,  0.72754861,  0.55675456,#
+         1.91692261,  1.64865863,  1.38629436,  0.77472717,  1.36097655,#
+         0.        ,  1.80828877,  1.7837273 ,  0.64185389,  0.69813472,#
+         2.39789527, -0.35667494,  1.79175947,  1.90210753,  1.39624469,#
+         1.84054963,  2.19722458,  1.89761986,  1.84054963,  0.74193734,#
+         0.55961579,  1.79175947,  0.91629073,  2.17475172,  1.36097655)
+df <- data.frame(y = LogPlanetMass, LogPlanetRadius = LogPlanetRadius, LogPlanetOrbit = LogPlanetOrbit, StarMetallicity = StarMetallicity, LogStarMass = LogStarMass, LogStarAge = LogStarAge)
+df
+m <- lm(y~., data=df)
+m
+summary(m)
+x <- c(-2,-1,0,1,2,3,4,5)
+y <- c(0,0,0,0,10,30,50,140)
+plot(x,y)
+plot(exp(x),y)
+plot(log(x),y)
+plot(x^2,y)
+plot(sqrt(x),y)
+plot(x^2,y)
+plot(exp(x),y)
+x <- c(-3,-2,-1,1,2,3)
+y <- c(-2,-1,0,0,1,2)
+plot(x,y)
+sign(1)
+sign(2)
+sign(-1)
+plot((x+sign(x)),y)
+plot((x-sign(x)),y)
+plot(c(13,-7),c(-7,13))
+points(c(3,3), col="red")
+plot(c(13,-7),c(-7,13))
+plot(3,3,col="red",add=T)
+plot(c(13,-7),c(-7,13))
+points(3,3, col="red")
+plot(c(3,0),c(0,3))
+points(1,1, col="red")
+plot(c(0.995,-0.762),c(-0.762,0.995))
+points(0.762,0.762, col="red")
+setwd("~/south-asia-neo/")
+source("R/bio.R")
+res <- load("~/ga1110.RData")
+load("~/ga1110.RData")
+res
 best <- as.numeric(res$genomes[1,])#
 costRaster <- reclassRaster(BIOMES, best[1:numGenes])#
 simDates <- simulateDispersal(costRaster, ORIGIN, START)#
-simDates <- crop(simDates, extent(DATES))
-plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=cubicl,#
-              main=list("Simulated arrival times", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.lines(ctr, lwd=0.5))#
-    return(p)#
-}
-plotMap2(simDates)
-a <- compareDates(simDates, DATES)
-a
-plot(ctr)
-library(maptools)
-lineLabel(ctr)
-sp.lineLabel(ct)
-sp.lineLabel(ctr)
-sp.lineLabel(ctr, ctr@data$level)
-plot(ct)
-plot(ctr)
-sp.lineLabel(ctr)
-plot(ctr)
-sp.lineLabel(ctr, c("1000"))
-plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.lines(ctr, lwd=0.5))#
-    return(p)#
-}
-plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.lines(ctr, lwd=0.5, col="white"))#
-    return(p)#
-}
-plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-}
-plotMap2(simDates)
-levelplot(simDates, margin=F, colorkey=list(at=seq(4000,10000,2000)))
-levelplot(simDates, margin=F, at=seq(2000,11000,100))
-levelplot(simDates, margin=F, at=seq(2000,11000,100), contour=T)
-contourplot(simDates)
-levelplot(simDates, margin=F, at=seq(2000,11000,100), contour=T)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-}
-plotMap2(simDates)
-levelplot(simDates, margin=F, at=seq(2000,11000,100))
-levelplot(simDates, margin=F, at=seq(2000,11000,100)) + contourplot(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         contourplot(x, at=seq(minDate, maxDate, 1000))#
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-}
-plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5, labels=list(cex=0.6), label.style="align")#
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-}
-plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5,#
-                     labels=list(cex=0.6), label.style="align",#
-                     col="white")#
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-};plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5,#
-                     labels=list(cex=0.5, col="white"), col="white")#
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-};plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.points(DATES)) +#
-         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5,#
-                     labels=list(cex=0.5, col="white"), col="white")#
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-};plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.points(DATES, col="white", cex=0.2)) +#
-         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5,#
-                     labels=list(cex=0.5, col="white"), col="white")#
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-};plotMap2(simDates)
-plotMap2 <- function(x) {#
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000#
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000#
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))#
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,#
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +#
-         layer(sp.polygons(coast, fill="lightgrey")) +#
-         layer(sp.points(DATES, col="white", cex=0.3)) +#
-         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5,#
-                     labels=list(cex=0.5, col="white"), col="white")#
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))#
-    return(p)#
-};plotMap2(simDates)
-dev.print(jpeg, "simDates.jpg", width=1200, res=300)
-dev.print(jpeg, "simDates.jpg", width=2800, res=300)
-dev.print(jpeg, "simDates.jpg", width=2000, res=300)
-dev.print(jpeg, "simDates.jpg", height=1000, res=300)
-dev.print(jpeg, "simDates.jpg", width=1200, res=300)
-dev.print(jpeg, "simDates.jpg", width=1600, res=300)
+simDates <- crop(simDates, extent(DATES))#
+#
+cat(paste("Best score:", best[numGenes+1], "\n"))
+plot(costRaster)
+plotMap(simDates)
+writeRaster(simDates, "simDates.tif")
+writeRaster(simDates, "simDates.tif", overwrite=T)
