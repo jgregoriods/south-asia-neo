@@ -11,9 +11,12 @@ suppressPackageStartupMessages({
 
 set.seed(123)
 
-ORIGIN <- c(42.45, 36.37)
-START <- 11748
-DATES <- read.csv("sites/dates.csv")
+#ORIGIN <- c(42.45, 36.37)
+#START <- 11748
+ORIGIN <- c(35.5511, 32.62)
+START <- 11537
+#DATES <- read.csv("sites/dates.csv")
+DATES <- read.csv("sites/merged.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- CRS("+init=epsg:4326")
 
@@ -46,15 +49,17 @@ compareDates <- function(simRaster, dates) {
     dates$simbp <- extract(simRaster, dates)
     dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
 
-    model <- lm(simbp~poly(dist, 2), data=dates)
-    x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)
-    y <- predict(model, newdata=data.frame(dist=x))
+    #model <- lm(simbp~poly(dist, 2), data=dates)
+    #x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)
+    #y <- predict(model, newdata=data.frame(dist=x))
 
-    plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="Age (cal BP)", pch=20)
-    points(dates$dist, dates$simbp, col=4, pch=20)
-    lines(x, y, col=4)
+    plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="Age (cal BP)", pch=20, cex=1.5,
+         cex.axis=1.5, cex.lab=1.5)
+    points(dates$dist, dates$simbp, col=4, pch=3, cex=1.5)
+    #lines(x, y, col=4)
+    legend("topright", legend=c("14C dates", "simulated"), col=c("black", 4),
+                                pch=c(20, 3), cex=c(1.5,1.5), y.intersp=1.5, box.lty=0)
 }
-
 
 testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {
     simDates <- simulateDispersal(costRaster, origin, date)
@@ -217,7 +222,7 @@ simDates <- simulateDispersal(costRaster, ORIGIN, START)
 simDates <- crop(simDates, extent(DATES))
 
 cat(paste("Best score:", best[numGenes+1], "\n"))
-write.csv(res$genomes, "results0810c.csv")
+write.csv(res$genomes, "results.csv")
 
 par(mfrow=c(2,2))
 plot(res$avgScores, col="blue", main="RMSE", ylim=c(min(res$maxScores), max(res$avgScores)),
@@ -229,26 +234,6 @@ legend("topright", legend = c("Avg score", "Best score"),
 
 compareDates(simDates, DATES)
 
-plotSpeed(1/costRaster)
-plotMap(simDates)
-
-save(res, file="ga0810c.RData")
-
-# scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/south-asia-neo/Rplots.pdf Rplots.pdf
-# scp jgregorio@marvin.s.upf.edu:/homes/users/jgregorio/SouthAsiaNeo/results.csv results1.csv
-
-plotMap2 <- function(x) {
-    minDate <- floor(min(values(x), na.rm=T) / 1000) * 1000
-    maxDate <- floor(max(values(x), na.rm=T) / 1000) * 1000
-    ctr <<- rasterToContour(x, levels=seq(minDate, maxDate, 1000))
-    p <- levelplot(x, margin=F, cuts=255, col.regions=parula,
-              main=list("Simulated arrival times (yr BP)", cex=0.8)) +
-         layer(sp.polygons(coast, fill="lightgrey")) +
-         layer(sp.points(DATES, col="white", cex=0.3)) +
-         contourplot(x, at=seq(minDate, maxDate, 1000), lwd=0.5,
-                     labels=list(cex=0.5, col="white"), col="white")
-         #layer(sp.lines(ctr, lwd=0.75, col="white"))
-    return(p)
-};plotMap2(simDates)
+save(res, file="ga.RData")
 
 }
