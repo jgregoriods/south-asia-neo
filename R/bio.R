@@ -7,16 +7,17 @@ suppressPackageStartupMessages({
     library(RColorBrewer)
     library(pals)
     library(rasterVis)
+    library(smatr)
 })
 
 set.seed(123)
 
-#ORIGIN <- c(42.45, 36.37)
-#START <- 11748
-ORIGIN <- c(35.5511, 32.62)
-START <- 11537
-#DATES <- read.csv("sites/dates.csv")
-DATES <- read.csv("sites/merged.csv")
+ORIGIN <- c(42.45, 36.37)
+START <- 11748
+#ORIGIN <- c(35.5511, 32.62)
+#START <- 11537
+DATES <- read.csv("sites/dates.csv")
+#DATES <- read.csv("sites/merged.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- CRS("+init=epsg:4326")
 
@@ -41,13 +42,14 @@ simulateDispersal <- function(costRaster, origin, date) {
     ac <- ac / 1000
     ac[values(ac) == Inf] <- NA
     simDates <- date - ac
-    return(simDates)
+    res <- list("dates"=simDates, "dists"=ac)
+    return(res)
 }
 
-
 compareDates <- function(simRaster, dates) {
-    dates$simbp <- extract(simRaster, dates)
-    dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
+    dates$simbp <- extract(simRaster$dates, dates)
+    #dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
+    dates$dist <- extract(simRaster$dists, dates)
 
     #model <- lm(simbp~poly(dist, 2), data=dates)
     #x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)
@@ -55,22 +57,24 @@ compareDates <- function(simRaster, dates) {
 
     plot(dates$dist, dates$bp, xlab="Distance from origin (km)", ylab="Age (cal BP)", pch=20, cex=1.5,
          cex.axis=1.5, cex.lab=1.5)
-    points(dates$dist, dates$simbp, col=4, pch=3, cex=1.5)
+    #points(dates$dist, dates$simbp, col=4, pch=3, cex=1.5)
     #lines(x, y, col=4)
-    legend("topright", legend=c("14C dates", "simulated"), col=c("black", 4),
-                                pch=c(20, 3), cex=c(1.5,1.5), y.intersp=1.5, box.lty=0)
+    #legend("topright", legend=c("14C dates", "simulated"), col=c("black", 4),
+    #                            pch=c(20, 3), cex=c(1.5,1.5), y.intersp=1.5, box.lty=0)
 }
 
 testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {
     simDates <- simulateDispersal(costRaster, origin, date)
     gc() 
     # Score
-    sites$simbp <- extract(simDates, sites)
-    sites <- sites[!is.na(sites$simbp),]
-    rmse <- sqrt(sum((sites$simbp - sites$bp)^2) / nrow(sites))
-    return(rmse)
+    #sites$simbp <- extract(simDates, sites)
+    sites$dist <- extract(simDates$dists, sites)
+    #sites <- sites[!is.na(sites$simbp),]
+    #rmse <- sqrt(sum((sites$simbp - sites$bp)^2) / nrow(sites))
+    #return(rmse)
+    rma <- sma(bp~dist, data=sites, robust=T)
+    return(rma$r2[[1]])
 }
-
 
 reclassRaster <- function(r, vals) {
     r.new <- r
@@ -103,7 +107,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
     # Initialize genomes
     genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))
     for (i in 1:numGenomes) {
-        genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)
+        genomes[i,] <- c(rnorm(numGenes, mean=1), 0)
     }
 
     maxScores <- c()
@@ -117,6 +121,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
 
     cl <- makeCluster(ncores)
     clusterEvalQ(cl, library("gdistance"))
+    clusterEvalQ(cl, library("smatr"))
     clusterExport(cl, varlist=c("BIOMES", "ORIGIN", "START", "DATES", "reclassRaster",
                                 "testModel", "simulateDispersal"),
                                 envir=environment())
@@ -129,11 +134,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
         genomeList <- split(genomes, seq(nrow(genomes)))
 
         res <- parLapply(cl, genomeList, function(x) {
-            if (x[1,numGenes+1] != Inf) {
+            if (x[1,numGenes+1] != 0) {
                 return (x[1,numGenes+1])
             } else {
                 if (min(x[1,1:numGenes]) <= 0) {
-                    return(Inf)
+                    return(0)
                 } else {
                     cost <- reclassRaster(BIOMES, as.numeric(x[1,1:numGenes]))
                     score <- testModel(cost)
@@ -145,11 +150,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
 
         genomes[,numGenes+1] <- unlist(res)
 
-        avgScores[iter] <- mean(genomes[,numGenes+1][!is.infinite(genomes[,numGenes+1])])
+        avgScores[iter] <- mean(genomes[,numGenes+1][genomes[,numGenes+1] > 0])
 
-        elite <- genomes[order(genomes[,numGenes+1]),][1:numElite,]
-        parents <- genomes[order(genomes[,numGenes+1]),][1:numParents,]
-        parents <- parents[order(as.numeric(rownames(parents))),]
+        elite <- genomes[order(genomes[,numGenes+1], decreasing=T),][1:numElite,]
+        parents <- genomes[order(genomes[,numGenes+1], decreasing=T),][1:numParents,]
+        parents <- parents[order(as.numeric(rownames(parents)), decreasing=T),]
 
         maxScores[iter] <- elite[1,numGenes+1]
 
@@ -166,7 +171,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
                 if (runif(1) < mutationRate) {
                     child <- mutate(child)
                 }
-                children[j,] <- c(child, Inf)
+                children[j,] <- c(child, 0)
                 j <- j+1
             }
         }
@@ -203,37 +208,33 @@ plotSpeed <- function(r) {
     plot(coast, add=T, lwd=1.5)
 }
 
+main <- function() {
 
-numGenes <- 6
+    numGenes <- 6
 
-numGenomes <- 500
-numParents <- 200
-numElite <- 50
-mutationRate <- 0.1
-numIter <- 20
+    numGenomes <- 500
+    numParents <- 200
+    numElite <- 50
+    mutationRate <- 0.1
+    numIter <- 20
 
-if (F) {
+    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=6)
 
-res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter)
+    best <- as.numeric(res$genomes[1,])
+    costRaster <- reclassRaster(BIOMES, best[1:numGenes])
+    simDates <- simulateDispersal(costRaster, ORIGIN, START)
+    simDates <- crop(simDates, extent(DATES))
 
-best <- as.numeric(res$genomes[1,])
-costRaster <- reclassRaster(BIOMES, best[1:numGenes])
-simDates <- simulateDispersal(costRaster, ORIGIN, START)
-simDates <- crop(simDates, extent(DATES))
+    cat(paste("Best score:", best[numGenes+1], "\n"))
+    write.csv(res$genomes, "results.csv")
 
-cat(paste("Best score:", best[numGenes+1], "\n"))
-write.csv(res$genomes, "results.csv")
+    par(mfrow=c(2,2))
+    plot(res$avgScores, col="blue", main="RMSE", ylim=c(min(res$maxScores), max(res$avgScores)),
+        pch=0, type="b", ylab="RMSE", xlab="Generation")
+    lines(res$maxScores, col="red", pch=0, type="b")
+    legend("topright", legend = c("Avg score", "Best score"),
+        col = c("blue", "red"), lty = 1:1)
 
-par(mfrow=c(2,2))
-plot(res$avgScores, col="blue", main="RMSE", ylim=c(min(res$maxScores), max(res$avgScores)),
-     pch=0, type="b", ylab="RMSE", xlab="Generation")
-lines(res$maxScores, col="red", pch=0, type="b")
-legend("topright", legend = c("Avg score", "Best score"),
-       col = c("blue", "red"), lty = 1:1)
-
-
-compareDates(simDates, DATES)
-
-save(res, file="ga.RData")
+    save(res, file="ga.RData")
 
 }
