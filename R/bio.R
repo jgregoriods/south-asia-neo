@@ -16,7 +16,7 @@ ORIGIN <- c(42.45, 36.37)
 START <- 11748
 #ORIGIN <- c(35.5511, 32.62)
 #START <- 11537
-DATES <- read.csv("sites/dates.csv")
+DATES <- read.csv("sites/dates100.csv")
 #DATES <- read.csv("sites/merged.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- CRS("+init=epsg:4326")
@@ -27,8 +27,8 @@ coast <- readOGR("layers/ocean.shp")
 #cal <- calibrate(DATES$C14, DATES$SD, verbose=FALSE)
 #DATES$bp <- medCal(cal)
 
-BIOMES <- raster("layers/newBiomes_final.tif")
-
+#BIOMES <- raster("layers/newBiomes_final.tif")
+BIOMES <- raster("layers/biomes25.tif")
 
 normRaster <- function(x) {
     return ((x - min(values(x), na.rm=TRUE)) / (max(values(x), na.rm=TRUE) - min(values(x), na.rm=TRUE)))
@@ -48,8 +48,8 @@ simulateDispersal <- function(costRaster, origin, date) {
 
 compareDates <- function(simRaster, dates) {
     dates$simbp <- extract(simRaster$dates, dates)
-    #dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
-    dates$dist <- extract(simRaster$dists, dates)
+    dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
+    #dates$dist <- extract(simRaster$dists, dates)
 
     #model <- lm(simbp~poly(dist, 2), data=dates)
     #x <- min(dates$dist, na.rm=T):max(dates$dist, na.rm=T)
@@ -140,7 +140,9 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
                 if (min(x[1,1:numGenes]) <= 0) {
                     return(0)
                 } else {
-                    cost <- reclassRaster(BIOMES, as.numeric(x[1,1:numGenes]))
+                    reclass_matrix <- cbind(1:6, as.numeric(x[1,1:numGenes]))
+                    cost <- reclassify(BIOMES, reclass_matrix)
+                    #cost <- reclassRaster(BIOMES, as.numeric(x[1,1:numGenes]))
                     score <- testModel(cost)
                     gc()
                     return(score)
@@ -215,11 +217,15 @@ main <- function() {
     numGenomes <- 500
     numParents <- 200
     numElite <- 50
-    mutationRate <- 0.1
+    mutationRate <- 0.2
     numIter <- 20
 
-    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=6)
+    start_time <- Sys.time()
+    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=10)
+    total_time <- Sys.time() - start_time
+    cat("Completed in",total_time[[1]],attributes(total_time)$units,"\n")
 
+    if (F) {
     best <- as.numeric(res$genomes[1,])
     costRaster <- reclassRaster(BIOMES, best[1:numGenes])
     simDates <- simulateDispersal(costRaster, ORIGIN, START)
@@ -234,7 +240,10 @@ main <- function() {
     lines(res$maxScores, col="red", pch=0, type="b")
     legend("topright", legend = c("Avg score", "Best score"),
         col = c("blue", "red"), lty = 1:1)
+    }
 
-    save(res, file="ga.RData")
+    save(res, file="ga2610.RData")
 
 }
+
+#main()
