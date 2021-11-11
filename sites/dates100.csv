@@ -1,71 +1,71 @@
-"","X","UID","Site","Country","State","Latitude","Longitude","Lat.Long.source","C14","SD","AMS","Material","Laboratory","Reference","Context","OBS","NEW","C14Cor","bp","clusterID","optional"
-"1",2,2,"Adam","India","Maharashtra",20.999473,79.449986,"Google Earth",3460,90,"No","Charcoal","PRL-1368","IAR92-93","Chalcolithic culture, Trench S5, Locus Qd 1, Layer 16","Maharashtra Chalco","Yes",NA,3722,2,TRUE
-"2",6,6,"Balathal","India","Rajasthan",24.722644,74.00979,"L",5770,100,"No","Charcoal","PRL-1933","IAR95-96","Chalcolithic, Trench OE, Layer 23, Locus SW","Chalco, but SWA pack","Yes",NA,6569,6,TRUE
-"3",8,8,"Banahalli","India","Karnataka",13.213368,77.911772,"Google Earth",3780,70,"null","Charcoal","PRL-1675","IAR94-95","","","",3780,4161,8,TRUE
-"4",9,9,"Barudih","India","Jharkhand",22.75,85.95,"AK",3010,200,"null","null","TF-1100","PR2, IAR71-72","","","",2925,3179,9,TRUE
-"5",10,10,"Bharatpur","India","West Bengal",23.883285,88.083905,"Google Earth",3390,135,"null","Charcoal","PRL-15","PR2, IAR74-75","","","",3294,3644,10,TRUE
-"6",12,12,"Burzahom","India","Jammu and Kashmir",34.174143,74.908065,"L",4330,115,"null","null","TF-128","PR2","","","",4208,4938,12,TRUE
-"7",13,13,"Chagylly-Depe II","Turkmenistan","Ahal",36.766667,60.55,"Brunet 1998",7000,110,"","","LE-592","Brunet 1998","Neolithic","","Yes",NA,7825,13,TRUE
-"8",14,14,"Chahar Boneh","Iran","Qazvin",35.766952,49.98568,"Pollard et al. 2012",7123,35,"","Charcoal","OxA-17742","Pollard et al. 2012","","","Yes",NA,7951,14,TRUE
-"9",16,16,"Chirand","India","Bihar",25.75,84.75,"AK",3710,150,"null","Charcoal","TF-1032","PR2, IAR70-71","","Wheat","",3605,4066,16,TRUE
-"10",18,18,"Chogha Gollan","Iran","Ilam",33.380556,46.2925,"ZRNC",9425,45,"Yes","Hordeum","KIA-43836","AF, RBC","","","",9425,10653,15,TRUE
-"11",19,19,"Chogha Mish","Iran","Khuzestan",32.223889,48.556111,"M",6610,50,"Yes","Charred material","Beta-106168","M","","","",6610,7499,19,TRUE
-"12",20,20,"Chopani Mando","India","Uttar Pradesh",24.916667,82.083333,"C",4675,110,"null","null","BS-129","PR2","","","",4543,5393,3,TRUE
-"13",21,21,"Daimabad II","India","Maharashtra",19.516632,74.69999,"L",3710,150,"No","Charcoal","PRL-426","PR2, IAR78-79","Chalcolithic, Post-Urban Harappan, Trench CZ61, Pit 25, Layer 14","Maharashtra Chalco","Yes",NA,4066,5,TRUE
-"14",24,24,"Damdama","India","Uttar Pradesh",25.491976,79.720164,"Google Earth",3984,54,"","Seed: Hordeum","DAMMESO-1","Liu et al. 2017","","Direct date on barley","Yes",NA,4453,24,TRUE
-"15",25,25,"Darra-i-Kur","Afghanistan","Badakhshan",36.783333,70,"M",3780,130,"null","Collagen","Gx-910","M","","","",3780,4162,25,TRUE
-"16",26,26,"Deh Morasi Ghundai","Afghanistan","Kandahar",31.520027,65.494363,"L",5850,291,"null","null","P-2292","S2","","","",5685,6688,26,TRUE
-"17",29,29,"Golbai Sasan","India","Orissa",20.0225,85.55,"Google Earth",2710,90,"null","Charcoal","PRL-1646","IAR93-94","","","",2633,2831,29,TRUE
-"18",30,30,"Gufkral","India","Jammu and Kashmir",35.9,75.983333,"S",3980,120,"null","Wood charcoal: Juglans regia","BS-359","PR2, IAR81-82, IAR82-83, IAR83-84","","","",3867,4446,30,TRUE
-"19",31,31,"Hajji Firuz Tepe","Iran","West Azarbaijan",36.991667,45.457778,"M",7926,86,"null","Charcoal, clay & ash","P-455","M","","","",7926,8778,22,TRUE
-"20",32,32,"Hallur","India","Karnataka",14.333333,75.616667,"AGK",3665,105,"No","Charcoal: Polyalthia sp., Anogeissus and Albizzia sp.","TF-580","PR2, IAR65-66","Allchin Period II, Neolithic, Trench 1, Layer 14","","",3561,4000,32,TRUE
-"21",34,34,"Harappa","Pakistan","Punjab",30.628889,72.863889,"Google Earth",3463,28,"Yes","Seed: Hordeum","OxA-30064","Liu et al. 2017","","Direct date on barley","Yes",NA,3738,34,TRUE
-"22",37,37,"Hormangan","Iran","Fars",30.507476,53.515374,"",7420,25,"","Charcoal","PLD-32545","Khanipour et al. 2021","Trench 1, Context 1038","","Yes",NA,8263,37,TRUE
-"23",41,41,"Jebel","Turkmenistan","Balkan",39.338475,54.164972,"Brunet 1998",6030,240,"","Charcoal","LE-1","Brunet 1998","Neolithic","","Yes",NA,6885,41,TRUE
-"24",42,42,"Jeitun","Turkmenistan","Ahal",37.95,58.233333,"M",7270,100,"Yes","T. monoccocum","OxA-2914","M","","","",7270,8093,42,TRUE
-"25",45,46,"Kayatha I","India","Madhya Pradesh",23.233333,76.033333,"AGK",3965,95,"No","Charcoal","TF-680","PR2, IAR67-68","Kayatha Period, Chalcolithic, Trench KTH-3, Layer 13","Wheat","Yes",NA,4420,45,TRUE
-"26",46,47,"Khed","India","Maharashtra",17.71933,73.396747,"Google Earth",3130,90,"No","Charcoal","PRL-221","PR2, IAR75-76","Jorwe, Trench KHD, Layer 7","Maharashtra Chalco","Yes",NA,3332,46,TRUE
-"27",47,48,"Khirsara","India","Gujarat",23.110321,69.021837,"Google Earth",3750,30,"Yes","Seed: Hordeum","Beta-427231","Liu et al. 2017","","Direct date on barley","Yes",NA,4111,47,TRUE
-"28",48,49,"Kiari","India","Jammu and Kashmir",33.475928,78.126373,"Google Earth",2890,160,"null","Charcoal","PRL-1400","IAR89-90","","","",2808,3046,48,TRUE
-"29",49,50,"Kili Gul Muhammad","Pakistan","Baluchistan",30.196352,67.019211,"Google Earth",5662,500,"null","null","L-180A","S2","","","",5502,6473,23,TRUE
-"30",53,54,"Lahuradewa","India","Uttar Pradesh",26.77,82.949722,"Google Earth",3827,147,"","Seed: Hordeum","Erl-6903","Liu et al. 2017","","Direct date on barley","Yes",NA,4226,53,TRUE
-"31",54,55,"Langhnaj","India","Gujarat",23.446722,72.498185,"Google Earth",3991,105,"null","Bones","TF-744","PR2, IAR67-68","","","",3878,4465,54,TRUE
-"32",57,59,"Miri Qalat","Pakistan","Baluchistan",26.033333,63,"Tengberg (1999)",5090,100,"","","Gif-8508","Besenval (1997)","Period II, Level IV","","Yes",NA,5822,57,TRUE
-"33",62,64,"Palavoy","India","Andhra Pradesh",14.516667,77.15,"AGK",3920,100,"null","Charcoal","TF-701","PR2, IAR67-68","","","",3809,4347,35,TRUE
-"34",64,66,"Piklihal","India","Karnataka",15.965704,76.450238,"Google Earth",3445,40,"Yes","Seed: Lens culinaris","BA-05772","FH","3348 originally","","",3348,3704,64,TRUE
-"35",65,67,"Pirak","Pakistan","Baluchistan",29.5,67.9,"AGK",4202,290,"null","Charcoal","Ly-1641","S2","","","",4083,4736,65,TRUE
-"36",66,68,"Polakonda","India","Andhra Pradesh",17.7,79.433333,"RVS",3355,120,"null","Wood charcoal","BS-98","PR2, IAR78-79","","","",3260,3602,66,TRUE
-"37",68,70,"Qermez Dere","Iraq","Ninawa",36.371291,42.451447,"Google Earth",10145,90,"null","Seed (Lens sp.)","OxA-3752","AF","","","",10145,11748,68,TRUE
-"38",69,71,"Rana Ghundai","Pakistan","Baluchistan",30.4,68.75,"L",5747,60,"null","null","P-2148","S2","","","",5585,6545,69,TRUE
-"39",70,72,"Rojdi","India","Gujarat",21.863056,70.918889,"L",4270,110,"No","Charcoal","PRL-1091","IAR86-87","Post-urban Harappan, Trench 45K","Mature Harappan/Rojdi C have SWA","Yes",NA,4832,70,TRUE
-"40",73,75,"Sanyasula Gavi","India","Andhra Pradesh",15.467222,78.216667,"PKB",3515,35,"Yes","Seed: Vigna radiata","R-28680/33","FH, PKB","","","",3416,3779,33,TRUE
-"41",75,77,"Sheikh-e Abad","Iran","Kermanshah",34.611667,47.269722,"M",9810,60,"null","Ash","Beta-258647","M","","","",9810,11228,28,TRUE
-"42",76,78,"Sohr Damb/Nal","Pakistan","Baluchistan",26.5,65.466667,"L",4501,32,"null","null","Bln-5384","GFV","","","",4501,5162,76,TRUE
-"43",77,79,"Songaon I","India","Maharashtra",18.65,74.0833,"AK2",3515,105,"No","Charcoal","TF-384","PR2, IAR66-67","Blotchy Gray Ware, Coarse Red Ware, Jorwe culture","Maharashtra Chalco","Yes",NA,3790,39,TRUE
-"44",78,80,"Tal-i Bakun B","Iran","Isfahan",33.166667,52.833333,"M",6264,70,"Yes","Ash","P-931","M","","","",6264,7178,78,TRUE
-"45",83,85,"Tapeh Mahtaj","Iran","Khuzestan",30.635456,50.203919,"Darabi et al. 2021",8125,42,"Yes","Charcoal","26665","Darabi et al. 2021","Middle phase, context 3002","","Yes",NA,9069,83,TRUE
-"46",85,87,"Tepe Abdul Hosein","Iran","Hamadan",34.183333,48.166667,"M",8945,275,"null","null","GX-6356","M","","","",8945,10037,11,TRUE
-"47",88,90,"Tepe Gaz Tavileh","Iran","Kerman",28.3333,56.5833,"AKK",6670,150,"null","Charcoal","PRL-744","AKK","","","",6670,7542,88,TRUE
-"48",90,92,"Tepe Sabz","Iran","Ilam",32.6,47.266667,"M",9050,160,"null","Chunks of carbonized wood","UCLA-750C","M","","","",9050,10181,4,TRUE
-"49",93,95,"Tepe Sialk","Iran","Isfahan",34.383333,51.633333,"M",5700,90,"null","Organic material (barley?)","Gx-949","M","","","",5700,6495,93,TRUE
-"50",94,96,"Tepe Yahya","Iran","Hormozgan",28.330867,56.867317,"Google Earth",6670,180,"null","null","PRL-748","M","","Ceramic","",6670,7542,88,TRUE
-"51",96,98,"Terdal","India","Karnataka",16.499212,75.049814,"Google Earth",3885,100,"null","Charcoal","TF-684","IAR67-68","","","",3775,4302,96,TRUE
-"52",98,100,"Tirumukkudal Narasipur","India","Karnataka",12.2167,76.9167,"AK2",3755,105,"null","Charcoal","TF-412","PR2, FBK, IAR65-66","","","",3649,4126,98,TRUE
-"53",99,101,"Togolok-Depe","Turkmenistan","Ahal",38.12,62,"Brunet 1998",7320,100,"","Charcoal","Bln-719","Brunet 1998","Neolithic","","Yes",NA,8130,99,TRUE
-"54",101,103,"Tol-e Nurabad","Iran","Fars",30.116667,51.5,"M",6977,56,"Yes","Charcoal","WK-13990","M","","","",6977,7807,101,TRUE
-"55",103,105,"Yanik Tepe","Iran","East Azerbaijan",37.933333,45.9,"M",7035,69,"null","Charcoal","P-1244","M","","","",7035,7860,103,TRUE
-"56",106,999,"Babarkot","India","Gujarat",20.871828,71.407615,"Google Earth",4130,90,"No","Charcoal","PRL-1492","IAR91-92","Sorath Harappan, Trench 26M, Locus SW + SEQUAD, Layer 4","HARAPPAN","Yes",NA,4655,106,TRUE
-"57",107,999,"Balakot","Pakistan","Sind",25.447182,66.727038,"L",4167,130,"No","null","HAR-1992","S2","Harappan levels, Harappan","HARAPPAN","Yes",NA,4683,105,TRUE
-"58",109,999,"Bara","India","Punjab",30.919915,76.522801,"L",3840,92,"No","Wood charcoal","TF-1205","S2, IAR71-72","Lower levels, Kot Diji, Bara 5, Layer 9","KOT DIJI","Yes",NA,4246,109,TRUE
-"59",110,999,"Barkhera","India","Madhya Pradesh",24.678541,75.223789,"Google Earth",3265,105,"No","Charcoal","PRL-111","PR2, IAR74-75","Chalcolithic, Layers II-III","CHALCO","Yes",NA,3496,110,TRUE
-"60",111,999,"Chandoli","India","Uttar Pradesh",25.261232,83.261135,"Google Earth",3280,68,"No","null","P-473","PR2","Jorwe","JORWE Chalco","Yes",NA,3506,111,TRUE
-"61",113,999,"Dholavira","India","Gujarat",23.887172,70.213735,"L",4400,90,"No","Charcoal","PRL-1505","IAR91-92","Harappa Culture, Trench 48 X 92 X 3+4, Layer 29","HARAPPAN","Yes",NA,5024,44,TRUE
-"62",114,999,"Ghaligai","Pakistan","Khyber Pakhtunkhawa",34.656062,72.255864,"Google Earth",3873,55,"No","null","R-378","S2","Swat Valley Period II, Kot Diji","KOT DIJI","Yes",NA,4297,114,TRUE
-"63",115,999,"Gumla","Pakistan","Khyber Pakhtunkhawa",31.883237,70.833268,"L",4198,72,"No","null","P-1812","S2","Period II, Kot Diji","KOT DIJI","Yes",NA,4715,115,TRUE
-"64",119,999,"Jhang","Pakistan","Punjab",33.56665,72.666667,"L",4145,50,"No","null","BM-2201","S2","Kot Dijian levels, Kot Diji","KOT DIJI","Yes",NA,4684,119,TRUE
-"65",120,999,"Kalibangan","India","Rajasthan",29.474327,74.130858,"L",4182,100,"No","null","TF-160","S2","Period II, Harappan","HARAPPAN","Yes",NA,4698,1,TRUE
-"66",121,999,"Kot Diji","Pakistan","Sind",27.347521,68.704594,"L",4544,141,"No","Charcoal","P-196","S2","Kot Dijian level, Kot Diji","KOT DIJI","Yes",NA,5188,58,TRUE
-"67",122,999,"Lothal","India","Gujarat",22.522567,72.2498,"L",4030,130,"No","null","TF-136","PR2, R1, PR, S2","Period IA, I, Harappan","HARAPPAN","Yes",NA,4520,122,TRUE
-"68",123,999,"Mahidpur","India","Madhya Pradesh",24.578031,77.993648,"Google Earth",3870,100,"No","Charred grains","PRL-1318","IAR90-91","Chalcolithic Culture, Trench MDP, Tr. 1, Layer 4","CHALCO","Yes",NA,4283,27,TRUE
-"69",124,999,"Mitathal","India","Haryana",28.891718,76.169803,"L",4330,214,"No","Charcoal","PRL-292","S2, IAR76-77","Period IIB, Punjab, Harappan, Trench MTL2, Locus O-V, Layer 4","HARAPPAN","Yes",NA,4930,7,TRUE
-"70",127,999,"Navdatoli","India","Madhya Pradesh",22.16311,75.583548,"Google Earth",4250,69,"No","null","P-476","PR2","Phase II (Malwa Ware, and a small amount of Jorwe Ware)","MALWA Chalco; maybe choose a later date","Yes",NA,4781,127,TRUE
+,X,UID,Site,Country,State,Latitude,Longitude,Lat.Long.source,C14,SD,AMS,Material,Laboratory,Reference,Context,OBS,NEW,C14Cor,bp,clusterID,optional
+1,2,2,Adam,India,Maharashtra,20.999473,79.449986,Google Earth,3460,90,No,Charcoal,PRL-1368,IAR92-93,"Chalcolithic culture, Trench S5, Locus Qd 1, Layer 16",Maharashtra Chalco,Yes,NA,3722,2,TRUE
+2,6,6,Balathal,India,Rajasthan,24.722644,74.00979,L,5770,100,No,Charcoal,PRL-1933,IAR95-96,"Chalcolithic, Trench OE, Layer 23, Locus SW","Chalco, but SWA pack",Yes,NA,6569,6,TRUE
+3,8,8,Banahalli,India,Karnataka,13.213368,77.911772,Google Earth,3780,70,null,Charcoal,PRL-1675,IAR94-95,,,,3780,4161,8,TRUE
+4,9,9,Barudih,India,Jharkhand,22.75,85.95,AK,3010,200,null,null,TF-1100,"PR2, IAR71-72",,,,2925,3179,9,TRUE
+5,10,10,Bharatpur,India,West Bengal,23.883285,88.083905,Google Earth,3390,135,null,Charcoal,PRL-15,"PR2, IAR74-75",,,,3294,3644,10,TRUE
+6,12,12,Burzahom,India,Jammu and Kashmir,34.174143,74.908065,L,4330,115,null,null,TF-128,PR2,,,,4208,4938,12,TRUE
+7,13,13,Chagylly-Depe II,Turkmenistan,Ahal,36.766667,60.55,Brunet 1998,7000,110,,,LE-592,Brunet 1998,Neolithic,,Yes,NA,7825,13,TRUE
+8,14,14,Chahar Boneh,Iran,Qazvin,35.766952,49.98568,Pollard et al. 2012,7123,35,,Charcoal,OxA-17742,Pollard et al. 2012,,,Yes,NA,7951,14,TRUE
+9,16,16,Chirand,India,Bihar,25.75,84.75,AK,3710,150,null,Charcoal,TF-1032,"PR2, IAR70-71",,Wheat,,3605,4066,16,TRUE
+10,18,18,Chogha Gollan,Iran,Ilam,33.380556,46.2925,ZRNC,9425,45,Yes,Hordeum,KIA-43836,"AF, RBC",,,,9425,10653,15,TRUE
+11,19,19,Chogha Mish,Iran,Khuzestan,32.223889,48.556111,M,6610,50,Yes,Charred material,Beta-106168,M,,,,6610,7499,19,TRUE
+12,20,20,Chopani Mando,India,Uttar Pradesh,24.916667,82.083333,C,4675,110,null,null,BS-129,PR2,,,,4543,5393,3,TRUE
+13,21,21,Daimabad II,India,Maharashtra,19.516632,74.69999,L,3710,150,No,Charcoal,PRL-426,"PR2, IAR78-79","Chalcolithic, Post-Urban Harappan, Trench CZ61, Pit 25, Layer 14",Maharashtra Chalco,Yes,NA,4066,5,TRUE
+14,24,24,Damdama,India,Uttar Pradesh,25.491976,79.720164,Google Earth,3984,54,,Seed: Hordeum,DAMMESO-1,Liu et al. 2017,,Direct date on barley,Yes,NA,4453,24,TRUE
+15,25,25,Darra-i-Kur,Afghanistan,Badakhshan,36.783333,70,M,3780,130,null,Collagen,Gx-910,M,,,,3780,4162,25,TRUE
+16,26,26,Deh Morasi Ghundai,Afghanistan,Kandahar,31.520027,65.494363,L,5850,291,null,null,P-2292,S2,,,,5685,6688,26,TRUE
+17,29,29,Golbai Sasan,India,Orissa,20.0225,85.55,Google Earth,2710,90,null,Charcoal,PRL-1646,IAR93-94,,,,2633,2831,29,TRUE
+18,30,30,Gufkral,India,Jammu and Kashmir,35.9,75.983333,S,3980,120,null,Wood charcoal: Juglans regia,BS-359,"PR2, IAR81-82, IAR82-83, IAR83-84",,,,3867,4446,30,TRUE
+19,31,31,Hajji Firuz Tepe,Iran,West Azarbaijan,36.991667,45.457778,M,7926,86,null,"Charcoal, clay & ash",P-455,M,,,,7926,8778,22,TRUE
+20,32,32,Hallur,India,Karnataka,14.333333,75.616667,AGK,3665,105,No,"Charcoal: Polyalthia sp., Anogeissus and Albizzia sp.",TF-580,"PR2, IAR65-66","Allchin Period II, Neolithic, Trench 1, Layer 14",,,3561,4000,32,TRUE
+21,34,34,Harappa,Pakistan,Punjab,30.628889,72.863889,Google Earth,3463,28,Yes,Seed: Hordeum,OxA-30064,Liu et al. 2017,,Direct date on barley,Yes,NA,3738,34,TRUE
+22,37,37,Hormangan,Iran,Fars,30.507476,53.515374,,7420,25,,Charcoal,PLD-32545,Khanipour et al. 2021,"Trench 1, Context 1038",,Yes,NA,8263,37,TRUE
+23,41,41,Jebel,Turkmenistan,Balkan,39.338475,54.164972,Brunet 1998,6030,240,,Charcoal,LE-1,Brunet 1998,Neolithic,,Yes,NA,6885,41,TRUE
+24,42,42,Jeitun,Turkmenistan,Ahal,37.95,58.233333,M,7270,100,Yes,T. monoccocum,OxA-2914,M,,,,7270,8093,42,TRUE
+25,45,46,Kayatha I,India,Madhya Pradesh,23.233333,76.033333,AGK,3965,95,No,Charcoal,TF-680,"PR2, IAR67-68","Kayatha Period, Chalcolithic, Trench KTH-3, Layer 13",Wheat,Yes,NA,4420,45,TRUE
+26,46,47,Khed,India,Maharashtra,17.71933,73.396747,Google Earth,3130,90,No,Charcoal,PRL-221,"PR2, IAR75-76","Jorwe, Trench KHD, Layer 7",Maharashtra Chalco,Yes,NA,3332,46,TRUE
+27,47,48,Khirsara,India,Gujarat,23.110321,69.021837,Google Earth,3750,30,Yes,Seed: Hordeum,Beta-427231,Liu et al. 2017,,Direct date on barley,Yes,NA,4111,47,TRUE
+28,48,49,Kiari,India,Jammu and Kashmir,33.475928,78.126373,Google Earth,2890,160,null,Charcoal,PRL-1400,IAR89-90,,,,2808,3046,48,TRUE
+29,49,50,Kili Gul Muhammad,Pakistan,Baluchistan,30.196352,67.019211,Google Earth,5662,500,null,null,L-180A,S2,,,,5502,6473,23,TRUE
+30,53,54,Lahuradewa,India,Uttar Pradesh,26.77,82.949722,Google Earth,3827,147,,Seed: Hordeum,Erl-6903,Liu et al. 2017,,Direct date on barley,Yes,NA,4226,53,TRUE
+31,54,55,Langhnaj,India,Gujarat,23.446722,72.498185,Google Earth,3991,105,null,Bones,TF-744,"PR2, IAR67-68",,,,3878,4465,54,TRUE
+32,57,59,Miri Qalat,Pakistan,Baluchistan,26.033333,63,Tengberg (1999),5090,100,,,Gif-8508,Besenval (1997),"Period II, Level IV",,Yes,NA,5822,57,TRUE
+33,62,64,Palavoy,India,Andhra Pradesh,14.516667,77.15,AGK,3920,100,null,Charcoal,TF-701,"PR2, IAR67-68",,,,3809,4347,35,TRUE
+34,64,66,Piklihal,India,Karnataka,15.965704,76.450238,Google Earth,3445,40,Yes,Seed: Lens culinaris,BA-05772,FH,3348 originally,,,3348,3704,64,TRUE
+35,65,67,Pirak,Pakistan,Baluchistan,29.5,67.9,AGK,4202,290,null,Charcoal,Ly-1641,S2,,,,4083,4736,65,TRUE
+36,66,68,Polakonda,India,Andhra Pradesh,17.7,79.433333,RVS,3355,120,null,Wood charcoal,BS-98,"PR2, IAR78-79",,,,3260,3602,66,TRUE
+37,67,69,M'lefaat,Iraq,,36.3333,43.5,,10890,140,,,,,,,,,12855,,
+38,69,71,Rana Ghundai,Pakistan,Baluchistan,30.4,68.75,L,5747,60,null,null,P-2148,S2,,,,5585,6545,69,TRUE
+39,70,72,Rojdi,India,Gujarat,21.863056,70.918889,L,4270,110,No,Charcoal,PRL-1091,IAR86-87,"Post-urban Harappan, Trench 45K",Mature Harappan/Rojdi C have SWA,Yes,NA,4832,70,TRUE
+40,73,75,Sanyasula Gavi,India,Andhra Pradesh,15.467222,78.216667,PKB,3515,35,Yes,Seed: Vigna radiata,R-28680/33,"FH, PKB",,,,3416,3779,33,TRUE
+41,75,77,Sheikh-e Abad,Iran,Kermanshah,34.611667,47.269722,M,9810,60,null,Ash,Beta-258647,M,,,,9810,11228,28,TRUE
+42,76,78,Sohr Damb/Nal,Pakistan,Baluchistan,26.5,65.466667,L,4501,32,null,null,Bln-5384,GFV,,,,4501,5162,76,TRUE
+43,77,79,Songaon I,India,Maharashtra,18.65,74.0833,AK2,3515,105,No,Charcoal,TF-384,"PR2, IAR66-67","Blotchy Gray Ware, Coarse Red Ware, Jorwe culture",Maharashtra Chalco,Yes,NA,3790,39,TRUE
+44,78,80,Tal-i Bakun B,Iran,Isfahan,33.166667,52.833333,M,6264,70,Yes,Ash,P-931,M,,,,6264,7178,78,TRUE
+45,83,85,Tapeh Mahtaj,Iran,Khuzestan,30.635456,50.203919,Darabi et al. 2021,8125,42,Yes,Charcoal,26665,Darabi et al. 2021,"Middle phase, context 3002",,Yes,NA,9069,83,TRUE
+46,85,87,Tepe Abdul Hosein,Iran,Hamadan,34.183333,48.166667,M,8945,275,null,null,GX-6356,M,,,,8945,10037,11,TRUE
+47,88,90,Tepe Gaz Tavileh,Iran,Kerman,28.3333,56.5833,AKK,6670,150,null,Charcoal,PRL-744,AKK,,,,6670,7542,88,TRUE
+48,90,92,Tepe Sabz,Iran,Ilam,32.6,47.266667,M,9050,160,null,Chunks of carbonized wood,UCLA-750C,M,,,,9050,10181,4,TRUE
+49,93,95,Tepe Sialk,Iran,Isfahan,34.383333,51.633333,M,5700,90,null,Organic material (barley?),Gx-949,M,,,,5700,6495,93,TRUE
+50,94,96,Tepe Yahya,Iran,Hormozgan,28.330867,56.867317,Google Earth,6670,180,null,null,PRL-748,M,,Ceramic,,6670,7542,88,TRUE
+51,96,98,Terdal,India,Karnataka,16.499212,75.049814,Google Earth,3885,100,null,Charcoal,TF-684,IAR67-68,,,,3775,4302,96,TRUE
+52,98,100,Tirumukkudal Narasipur,India,Karnataka,12.2167,76.9167,AK2,3755,105,null,Charcoal,TF-412,"PR2, FBK, IAR65-66",,,,3649,4126,98,TRUE
+53,99,101,Togolok-Depe,Turkmenistan,Ahal,38.12,62,Brunet 1998,7320,100,,Charcoal,Bln-719,Brunet 1998,Neolithic,,Yes,NA,8130,99,TRUE
+54,101,103,Tol-e Nurabad,Iran,Fars,30.116667,51.5,M,6977,56,Yes,Charcoal,WK-13990,M,,,,6977,7807,101,TRUE
+55,103,105,Yanik Tepe,Iran,East Azerbaijan,37.933333,45.9,M,7035,69,null,Charcoal,P-1244,M,,,,7035,7860,103,TRUE
+56,106,999,Babarkot,India,Gujarat,20.871828,71.407615,Google Earth,4130,90,No,Charcoal,PRL-1492,IAR91-92,"Sorath Harappan, Trench 26M, Locus SW + SEQUAD, Layer 4",HARAPPAN,Yes,NA,4655,106,TRUE
+57,107,999,Balakot,Pakistan,Sind,25.447182,66.727038,L,4167,130,No,null,HAR-1992,S2,"Harappan levels, Harappan",HARAPPAN,Yes,NA,4683,105,TRUE
+58,109,999,Bara,India,Punjab,30.919915,76.522801,L,3840,92,No,Wood charcoal,TF-1205,"S2, IAR71-72","Lower levels, Kot Diji, Bara 5, Layer 9",KOT DIJI,Yes,NA,4246,109,TRUE
+59,110,999,Barkhera,India,Madhya Pradesh,24.678541,75.223789,Google Earth,3265,105,No,Charcoal,PRL-111,"PR2, IAR74-75","Chalcolithic, Layers II-III",CHALCO,Yes,NA,3496,110,TRUE
+60,111,999,Chandoli,India,Uttar Pradesh,25.261232,83.261135,Google Earth,3280,68,No,null,P-473,PR2,Jorwe,JORWE Chalco,Yes,NA,3506,111,TRUE
+61,113,999,Dholavira,India,Gujarat,23.887172,70.213735,L,4400,90,No,Charcoal,PRL-1505,IAR91-92,"Harappa Culture, Trench 48 X 92 X 3+4, Layer 29",HARAPPAN,Yes,NA,5024,44,TRUE
+62,114,999,Ghaligai,Pakistan,Khyber Pakhtunkhawa,34.656062,72.255864,Google Earth,3873,55,No,null,R-378,S2,"Swat Valley Period II, Kot Diji",KOT DIJI,Yes,NA,4297,114,TRUE
+63,115,999,Gumla,Pakistan,Khyber Pakhtunkhawa,31.883237,70.833268,L,4198,72,No,null,P-1812,S2,"Period II, Kot Diji",KOT DIJI,Yes,NA,4715,115,TRUE
+64,119,999,Jhang,Pakistan,Punjab,33.56665,72.666667,L,4145,50,No,null,BM-2201,S2,"Kot Dijian levels, Kot Diji",KOT DIJI,Yes,NA,4684,119,TRUE
+65,120,999,Kalibangan,India,Rajasthan,29.474327,74.130858,L,4182,100,No,null,TF-160,S2,"Period II, Harappan",HARAPPAN,Yes,NA,4698,1,TRUE
+66,121,999,Kot Diji,Pakistan,Sind,27.347521,68.704594,L,4544,141,No,Charcoal,P-196,S2,"Kot Dijian level, Kot Diji",KOT DIJI,Yes,NA,5188,58,TRUE
+67,122,999,Lothal,India,Gujarat,22.522567,72.2498,L,4030,130,No,null,TF-136,"PR2, R1, PR, S2","Period IA, I, Harappan",HARAPPAN,Yes,NA,4520,122,TRUE
+68,123,999,Mahidpur,India,Madhya Pradesh,24.578031,77.993648,Google Earth,3870,100,No,Charred grains,PRL-1318,IAR90-91,"Chalcolithic Culture, Trench MDP, Tr. 1, Layer 4",CHALCO,Yes,NA,4283,27,TRUE
+69,124,999,Mitathal,India,Haryana,28.891718,76.169803,L,4330,214,No,Charcoal,PRL-292,"S2, IAR76-77","Period IIB, Punjab, Harappan, Trench MTL2, Locus O-V, Layer 4",HARAPPAN,Yes,NA,4930,7,TRUE
+70,127,999,Navdatoli,India,Madhya Pradesh,22.16311,75.583548,Google Earth,4250,69,No,null,P-476,PR2,"Phase II (Malwa Ware, and a small amount of Jorwe Ware)",MALWA Chalco; maybe choose a later date,Yes,NA,4781,127,TRUE

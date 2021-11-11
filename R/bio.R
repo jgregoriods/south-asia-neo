@@ -2,47 +2,78 @@ suppressPackageStartupMessages({
     library(gdistance)
     library(rgdal)
     library(parallel)
-    library(viridis)
-    library(RColorBrewer)
-    library(pals)
     library(rasterVis)
-    library(smatr)
+    library(rgrass7)
+    library(raster)
+    library(sp)
 })
+
+use_sp()
 
 set.seed(123)
 
-ORIGIN <- c(42.45, 36.37)
-START <- 11748
+ORIGIN <- c(43.5, 36.33)    # M'lefaat
+START <- 12855
 DATES <- read.csv("sites/dates100.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- CRS("+init=epsg:4326")
 
 BIOMES <- raster("layers/biomes25.tif")
+BIOMES.sp <- as(BIOMES, "SpatialPixelsDataFrame")
+names(BIOMES.sp@data) <- c("val")
 
-simulateDispersal <- function(costRaster, origin, date) {
-    tr <- transition(costRaster, function(x) 1 / mean(x), 16)
-    tr <- geoCorrection(tr)
-    ac <- accCost(tr, origin)
-    ac <- ac / 1000
-    ac[values(ac) == Inf] <- NA
-    simDates <- date - ac
-    res <- list("dates"=simDates, "dists"=ac)
-    return(res)
+setGRASS <- function(RASTER, RES) {
+    writeRAST(RASTER, "GRID", zcol="val", flags=c("quiet", "overwrite"))
+    execGRASS("g.region", flags=c("d"), res=as.character(RES), raster="GRID")
+}
+
+initGRASS("/usr/lib/grass78", home=tempdir(), mapset="PERMANENT", override=T)
+execGRASS('g.proj', flags=c('c'), georef='layers/biomes25.tif')
+execGRASS('r.import', input='layers/biomes25.tif', output='DEM')
+execGRASS('g.region', raster='DEM')
+
+#setGRASS(BIOMES.sp, 0.25)
+
+costSurface <- function(coords) {
+    execGRASS("r.cost", flags=c("k", "overwrite", "quiet"), input="GRID", start_coordinates=coords, output="COST", max_cost=0)
+    cost <- raster(readRAST("COST"))
+    return(cost)
+}
+
+#simulateDispersal <- function(costRaster, origin, start_date) {
+simulateDispersal <- function(origin, start_date) {
+    #costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
+    #names(costSPDF@data) <- c("val")
+#    tr <- transition(costRaster, function(x) 1 / mean(x), 16)
+#    tr <- geoCorrection(tr)
+#    ac <- accCost(tr, origin)
+#    ac <- ac / 1000
+#    ac[values(ac) == Inf] <- NA
+    cs <- costSurface(origin)
+    ac <- cs * 0.25 * 111
+    simDates <- start_date - ac
+    return(simDates)
 }
 
 compareDates <- function(simRaster, dates) {
-    dates$simbp <- extract(simRaster$dates, dates)
+    dates$simbp <- extract(simRaster, dates)
     dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
     plot(dates$dist, dates$bp, xlab="Distance from origin (km)",
          ylab="Age (cal BP)", pch=20, cex=1.5, cex.axis=1.5, cex.lab=1.5)
+    points(dates$dist, dates$simbp)
 }
 
-testModel <- function(costRaster, sites=DATES, origin=ORIGIN, date=START) {
-    simDates <- simulateDispersal(costRaster, origin, date)
+testModel <- function(costRaster, sites=DATES, origin=ORIGIN, start_date=START) {
+    costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
+    names(costSPDF@data) <- c("val")
+    setGRASS(costSPDF, 0.25)
+    #simDates <- simulateDispersal(costRaster, origin, start_date)
+    simDates <- simulateDispersal(origin, start_date)
     gc() 
-    sites$dist <- extract(simDates$dists, sites)
-    rma <- sma(bp~dist, data=sites, robust=T)
-    return(rma$r2[[1]])
+    sites$simbp <- extract(simDates, sites)
+    sites <- sites[!is.na(sites$simbp),]
+    rmse <- sqrt(sum((sites$simbp - sites$bp)^2) / nrow(sites))
+    return(rmse)
 }
 
 ###########################################################
@@ -65,7 +96,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
     # Initialize genomes
     genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))
     for (i in 1:numGenomes) {
-        genomes[i,] <- c(rnorm(numGenes, mean=1), 0)
+        genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)
     }
 
     maxScores <- c()
@@ -78,11 +109,19 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
     }
 
     cl <- makeCluster(ncores)
-    clusterEvalQ(cl, library("gdistance"))
-    clusterEvalQ(cl, library("smatr"))
-    clusterExport(cl, varlist=c("BIOMES", "ORIGIN", "START", "DATES",
-                                "reclassRaster", "testModel",
-                                "simulateDispersal"), envir=environment())
+    clusterEvalQ(cl, library("sp"))
+    clusterEvalQ(cl, library("raster"))
+    clusterEvalQ(cl, library("rgrass7"))
+    clusterExport(cl, varlist=c("BIOMES", "BIOMES.sp", "ORIGIN", "START", "DATES",
+                                "testModel", "simulateDispersal", "costSurface", "setGRASS"),
+                                envir=environment())
+    clusterEvalQ(cl, use_sp())
+    clusterEvalQ(cl, initGRASS("/usr/lib/grass78", home=tempdir(), mapset="PERMANENT", override=T))
+    clusterEvalQ(cl, execGRASS('g.proj', flags=c('c'), georef='layers/biomes25.tif'))
+    clusterEvalQ(cl, execGRASS('r.import', input='layers/biomes25.tif', output='DEM'))
+    clusterEvalQ(cl, execGRASS('g.region', raster='DEM'))
+
+    #clusterEvalQ(cl, setGRASS(BIOMES.sp, 0.25))
 
     cat(paste("\nRunning genetic algorithm on", ncores,
             "parallel workers.\nThis may take a while...\n"))
@@ -91,11 +130,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
         genomeList <- split(genomes, seq(nrow(genomes)))
 
         res <- parLapply(cl, genomeList, function(x) {
-            if (x[1,numGenes+1] != 0) {
+            if (x[1,numGenes+1] != Inf) {
                 return (x[1,numGenes+1])
             } else {
                 if (min(x[1,1:numGenes]) <= 0) {
-                    return(0)
+                    return(Inf)
                 } else {
                     reclass_matrix <- cbind(1:6, as.numeric(x[1,1:numGenes]))
                     cost <- reclassify(BIOMES, reclass_matrix)
@@ -108,11 +147,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
 
         genomes[,numGenes+1] <- unlist(res)
 
-        avgScores[iter] <- mean(genomes[,numGenes+1][genomes[,numGenes+1] > 0])
+        avgScores[iter] <- mean(genomes[,numGenes+1][genomes[,numGenes+1] < Inf])
 
-        elite <- genomes[order(genomes[,numGenes+1], decreasing=T),][1:numElite,]
-        parents <- genomes[order(genomes[,numGenes+1], decreasing=T),][1:numParents,]
-        parents <- parents[order(as.numeric(rownames(parents)), decreasing=T),]
+        elite <- genomes[order(genomes[,numGenes+1]),][1:numElite,]
+        parents <- genomes[order(genomes[,numGenes+1]),][1:numParents,]
+        parents <- parents[order(as.numeric(rownames(parents))),]
 
         maxScores[iter] <- elite[1,numGenes+1]
 
@@ -130,7 +169,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
                 if (runif(1) < mutationRate) {
                     child <- mutate(child)
                 }
-                children[j,] <- c(child, 0)
+                children[j,] <- c(child, Inf)
                 j <- j+1
             }
         }
@@ -164,8 +203,12 @@ main <- function() {
     best <- as.numeric(res$genomes[1,])
     reclass_matrix <- cbind(1:6, best[1:numGenes])
     costRaster <- reclassify(BIOMES, reclass_matrix)
+    costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
+    names(costSPDF@data) <- c("val")
 
-    simDates <- simulateDispersal(costRaster, ORIGIN, START)
+    setGRASS(costSPDF, 0.25)
+
+    simDates <- simulateDispersal(ORIGIN, START)
     simDates.r <- crop(simDates$dates, extent(DATES))
 
     cat(paste("Best score:", best[numGenes+1], "\n"))
@@ -180,5 +223,7 @@ main <- function() {
         col = c("blue", "red"), lty = 1:1)
     }
 
-    save(res, file="ga0811.RData")
+    save(res, file="ga1111.RData")
 }
+
+#main()
