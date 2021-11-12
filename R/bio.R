@@ -12,13 +12,25 @@ use_sp()
 
 set.seed(123)
 
-ORIGIN <- c(43.5, 36.33)    # M'lefaat
-START <- 12855
+WGS <- CRS("+init=epsg:4326")
+ALBERS <- CRS("+proj=eqdc +lat_0=0 +lon_0=0 +lat_1=7 +lat_2=-32 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+
+#ORIGIN <- c(43.5, 36.33)    # M'lefaat
+#START <- 12855
 DATES <- read.csv("sites/dates100.csv")
 coordinates(DATES) <- ~Longitude+Latitude
-proj4string(DATES) <- CRS("+init=epsg:4326")
+proj4string(DATES) <- WGS
+DATES.m <- spTransform(DATES, ALBERS)
 
-BIOMES <- raster("layers/biomes25.tif")
+ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="M'lefaat",]@coords)
+START <- DATES.m[DATES.m$Site=="M'lefaat",]$bp
+
+#BIOMES <- raster("layers/biomes25.tif")
+#BIOMES <- raster("layers/newBiomes_final.tif")
+#BIOMES.m <- projectRaster(BIOMES, res=25000, crs=ALBERS, method="ngb")
+#writeRaster(BIOMES.m, "layers/biomes.tif", overwrite=T)
+#BIOMES <- raster("layers/biomes.tif")
+BIOMES <- raster("layers/biomes_b_rec_m.tif")
 BIOMES.sp <- as(BIOMES, "SpatialPixelsDataFrame")
 names(BIOMES.sp@data) <- c("val")
 
@@ -28,11 +40,11 @@ setGRASS <- function(RASTER, RES) {
 }
 
 initGRASS("/usr/lib/grass78", home=tempdir(), mapset="PERMANENT", override=T)
-execGRASS('g.proj', flags=c('c'), georef='layers/biomes25.tif')
-execGRASS('r.import', input='layers/biomes25.tif', output='DEM')
+execGRASS('g.proj', flags=c('c'), georef='layers/biomes_b_rec_m.tif')
+execGRASS('r.import', input='layers/biomes_b_rec_m.tif', output='DEM')
 execGRASS('g.region', raster='DEM')
 
-#setGRASS(BIOMES.sp, 0.25)
+#setGRASS(BIOMES.sp, 25000)
 
 costSurface <- function(coords) {
     execGRASS("r.cost", flags=c("k", "overwrite", "quiet"), input="GRID", start_coordinates=coords, output="COST", max_cost=0)
@@ -50,8 +62,7 @@ simulateDispersal <- function(origin, start_date) {
 #    ac <- ac / 1000
 #    ac[values(ac) == Inf] <- NA
     cs <- costSurface(origin)
-    ac <- cs * 0.25 * 111
-    simDates <- start_date - ac
+    simDates <- start_date - (cs * 25)
     return(simDates)
 }
 
@@ -66,7 +77,7 @@ compareDates <- function(simRaster, dates) {
 testModel <- function(costRaster, sites=DATES, origin=ORIGIN, start_date=START) {
     costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
     names(costSPDF@data) <- c("val")
-    setGRASS(costSPDF, 0.25)
+    setGRASS(costSPDF, 25000)
     #simDates <- simulateDispersal(costRaster, origin, start_date)
     simDates <- simulateDispersal(origin, start_date)
     gc() 
@@ -117,8 +128,8 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
                                 envir=environment())
     clusterEvalQ(cl, use_sp())
     clusterEvalQ(cl, initGRASS("/usr/lib/grass78", home=tempdir(), mapset="PERMANENT", override=T))
-    clusterEvalQ(cl, execGRASS('g.proj', flags=c('c'), georef='layers/biomes25.tif'))
-    clusterEvalQ(cl, execGRASS('r.import', input='layers/biomes25.tif', output='DEM'))
+    clusterEvalQ(cl, execGRASS('g.proj', flags=c('c'), georef='layers/biomes_b_rec_m.tif'))
+    clusterEvalQ(cl, execGRASS('r.import', input='layers/biomes_b_rec_m.tif', output='DEM'))
     clusterEvalQ(cl, execGRASS('g.region', raster='DEM'))
 
     #clusterEvalQ(cl, setGRASS(BIOMES.sp, 0.25))
@@ -136,7 +147,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
                 if (min(x[1,1:numGenes]) <= 0) {
                     return(Inf)
                 } else {
-                    reclass_matrix <- cbind(1:6, as.numeric(x[1,1:numGenes]))
+                    reclass_matrix <- cbind(1:numGenes, as.numeric(x[1,1:numGenes]))
                     cost <- reclassify(BIOMES, reclass_matrix)
                     score <- testModel(cost)
                     gc()
@@ -185,12 +196,10 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
 }
 
 main <- function() {
-
-    numGenes <- 6
-
-    numGenomes <- 500
-    numParents <- 200
-    numElite <- 50
+    numGenes <- 12
+    numGenomes <- 1000
+    numParents <- 500
+    numElite <- 100
     mutationRate <- 0.2
     numIter <- 20
 
@@ -199,31 +208,29 @@ main <- function() {
     total_time <- Sys.time() - start_time
     cat("Completed in",total_time[[1]],attributes(total_time)$units,"\n")
 
-    if (F) {
     best <- as.numeric(res$genomes[1,])
-    reclass_matrix <- cbind(1:6, best[1:numGenes])
+    reclass_matrix <- cbind(1:numGenes, best[1:numGenes])
     costRaster <- reclassify(BIOMES, reclass_matrix)
     costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
     names(costSPDF@data) <- c("val")
 
-    setGRASS(costSPDF, 0.25)
+    setGRASS(costSPDF, 25000)
 
     simDates <- simulateDispersal(ORIGIN, START)
-    simDates.r <- crop(simDates$dates, extent(DATES))
+    #simDates.r <- crop(simDates, extent(DATES.m))
+    simDates.ll <- projectRaster(simDates, res=0.25, crs=WGS)
+    simDates.r <- crop(simDates.ll, extent(DATES))
 
     cat(paste("Best score:", best[numGenes+1], "\n"))
-    write.csv(res$genomes, "results.csv")
 
-    par(mfrow=c(2,2))
-    plot(res$avgScores, col="blue", main="RMSE",
-         ylim=c(min(res$maxScores), max(res$avgScores)),
-         pch=0, type="b", ylab="RMSE", xlab="Generation")
-    lines(res$maxScores, col="red", pch=0, type="b")
-    legend("topright", legend = c("Avg score", "Best score"),
-        col = c("blue", "red"), lty = 1:1)
-    }
+    timeStamp <- round(as.numeric(Sys.time()))
 
-    save(res, file="ga1111.RData")
+    speeds <- data.frame("region"=1:numGenes, "speed"=1/best[1:numGenes])
+    write.csv(speeds, file=paste("results/res", timeStamp, ".csv", sep=""))
+    save(res, simDates, file=paste("results/ga", timeStamp, ".RData", sep=""))
+    writeRaster(simDates.r, paste("results/sim", timeStamp, ".tif", sep=""))
+
+    plot(simDates.ll)
 }
 
-#main()
+main()
