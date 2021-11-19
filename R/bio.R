@@ -14,23 +14,29 @@ set.seed(123)
 
 WGS <- CRS("+init=epsg:4326")
 ALBERS <- CRS("+proj=eqdc +lat_0=0 +lon_0=0 +lat_1=7 +lat_2=-32 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+#RASTER_FILE <- "layers/biomes__.tif"
+RASTER_FILE <- "layers/biomes_b_rec_m.tif"
 
 #ORIGIN <- c(43.5, 36.33)    # M'lefaat
 #START <- 12855
-DATES <- read.csv("sites/dates100.csv")
+#DATES <- read.csv("sites/dates100.csv")
+DATES <- read.csv("sites/dates_.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- WGS
 DATES.m <- spTransform(DATES, ALBERS)
 
-ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="M'lefaat",]@coords)
-START <- DATES.m[DATES.m$Site=="M'lefaat",]$bp
+ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="Dhra",]@coords)
+START <- DATES.m[DATES.m$Site=="Dhra",]$bp
+
+#ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="M'lefaat",]@coords)
+#START <- DATES.m[DATES.m$Site=="M'lefaat",]$bp
 
 #BIOMES <- raster("layers/biomes25.tif")
 #BIOMES <- raster("layers/newBiomes_final.tif")
 #BIOMES.m <- projectRaster(BIOMES, res=25000, crs=ALBERS, method="ngb")
 #writeRaster(BIOMES.m, "layers/biomes.tif", overwrite=T)
 #BIOMES <- raster("layers/biomes.tif")
-BIOMES <- raster("layers/biomes_b_rec_m.tif")
+BIOMES <- raster(RASTER_FILE)
 BIOMES.sp <- as(BIOMES, "SpatialPixelsDataFrame")
 names(BIOMES.sp@data) <- c("val")
 
@@ -40,8 +46,8 @@ setGRASS <- function(RASTER, RES) {
 }
 
 initGRASS("/usr/lib/grass78", home=tempdir(), mapset="PERMANENT", override=T)
-execGRASS('g.proj', flags=c('c'), georef='layers/biomes_b_rec_m.tif')
-execGRASS('r.import', input='layers/biomes_b_rec_m.tif', output='DEM')
+execGRASS('g.proj', flags=c('c'), georef=RASTER_FILE)
+execGRASS('r.import', input=RASTER_FILE, output='DEM')
 execGRASS('g.region', raster='DEM')
 
 #setGRASS(BIOMES.sp, 25000)
@@ -123,13 +129,13 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
     clusterEvalQ(cl, library("sp"))
     clusterEvalQ(cl, library("raster"))
     clusterEvalQ(cl, library("rgrass7"))
-    clusterExport(cl, varlist=c("BIOMES", "BIOMES.sp", "ORIGIN", "START", "DATES",
+    clusterExport(cl, varlist=c("RASTER_FILE", "BIOMES", "BIOMES.sp", "ORIGIN", "START", "DATES",
                                 "testModel", "simulateDispersal", "costSurface", "setGRASS"),
                                 envir=environment())
     clusterEvalQ(cl, use_sp())
     clusterEvalQ(cl, initGRASS("/usr/lib/grass78", home=tempdir(), mapset="PERMANENT", override=T))
-    clusterEvalQ(cl, execGRASS('g.proj', flags=c('c'), georef='layers/biomes_b_rec_m.tif'))
-    clusterEvalQ(cl, execGRASS('r.import', input='layers/biomes_b_rec_m.tif', output='DEM'))
+    clusterEvalQ(cl, execGRASS('g.proj', flags=c('c'), georef=RASTER_FILE))
+    clusterEvalQ(cl, execGRASS('r.import', input=RASTER_FILE, output='DEM'))
     clusterEvalQ(cl, execGRASS('g.region', raster='DEM'))
 
     #clusterEvalQ(cl, setGRASS(BIOMES.sp, 0.25))
@@ -197,11 +203,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
 
 main <- function() {
     numGenes <- 12
-    numGenomes <- 1000
-    numParents <- 500
-    numElite <- 100
+    numGenomes <- 250
+    numParents <- 125
+    numElite <- 25
     mutationRate <- 0.2
-    numIter <- 20
+    numIter <- 10
 
     start_time <- Sys.time()
     res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=10)
