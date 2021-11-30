@@ -22,11 +22,13 @@ ALBERS <- CRS("+proj=eqdc +lat_0=0 +lon_0=0 +lat_1=7 +lat_2=-32 +x_0=0 +y_0=0 +e
 ELEV_FILE <- "new_layers/ele_m.tif"
 TEMP_FILE <- "new_layers/bio8_m.tif"
 PREC_FILE <- "new_layers/bio19_m.tif"
+RIVS_FILE <- "new_layers/riv_m.tif"
 
 ELEV <- scaleRaster(raster(ELEV_FILE))
 TEMP <- scaleRaster(raster(TEMP_FILE))
 PREC <- scaleRaster(raster(PREC_FILE))
-RASTERS <- stack(ELEV, TEMP, PREC)
+RIVS <- scaleRaster(raster(RIVS_FILE))
+RASTERS <- stack(ELEV, TEMP, PREC, RIVS)
 
 #ORIGIN <- c(43.5, 36.33)    # M'lefaat
 #START <- 12855
@@ -90,7 +92,6 @@ compareDates <- function(simRaster, dates) {
          ylab="Age (cal BP)", pch=20, cex=1.5, cex.axis=1.5, cex.lab=1.5)
     points(dates$dist, dates$simbp)
 }
-compareDates(simDates.ll, DATES)
 
 testModel <- function(costRaster, sites=DATES, origin=ORIGIN, start_date=START) {
     costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
@@ -215,12 +216,12 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
 }
 
 main <- function() {
-    numGenes <- 3
-    numGenomes <- 50
-    numParents <- 25
-    numElite <- 5
+    numGenes <- 4
+    numGenomes <- 250
+    numParents <- 125
+    numElite <- 25
     mutationRate <- 0.2
-    numIter <- 5
+    numIter <- 10
 
     start_time <- Sys.time()
     res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=10)
@@ -245,12 +246,12 @@ main <- function() {
 
     timeStamp <- round(as.numeric(Sys.time()))
 
-    speeds <- data.frame("region"=1:numGenes, "speed"=1/best[1:numGenes])
-    write.csv(speeds, file=paste("results/res", timeStamp, ".csv", sep=""))
-    save(res, simDates.ll, file=paste("results/ga", timeStamp, ".RData", sep=""))
+    #speeds <- data.frame("region"=1:numGenes, "speed"=1/best[1:numGenes])
+    #write.csv(speeds, file=paste("results/res", timeStamp, ".csv", sep=""))
+    save(res, simDates.ll, cost, file=paste("results/ga", timeStamp, ".RData", sep=""))
     writeRaster(simDates.r, paste("results/sim", timeStamp, ".tif", sep=""))
 
     plot(simDates.ll)
 }
 
-#main()
+main()
