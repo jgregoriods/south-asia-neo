@@ -217,9 +217,9 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
 
 main <- function() {
     numGenes <- 4
-    numGenomes <- 250
-    numParents <- 125
-    numElite <- 25
+    numGenomes <- 50
+    numParents <- 25
+    numElite <- 5
     mutationRate <- 0.2
     numIter <- 10
 

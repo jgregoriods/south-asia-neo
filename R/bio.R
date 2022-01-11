@@ -25,8 +25,8 @@ coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- WGS
 DATES.m <- spTransform(DATES, ALBERS)
 
-ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="Dhra",]@coords)
-START <- DATES.m[DATES.m$Site=="Dhra",]$bp
+ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="Mureybet",]@coords)
+START <- DATES.m[DATES.m$Site=="Mureybet",]$bp
 
 #ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="M'lefaat",]@coords)
 #START <- DATES.m[DATES.m$Site=="M'lefaat",]$bp
@@ -104,7 +104,7 @@ crossover <- function(x, y) {
 
 mutate <- function(x) {
     i <- sample(1:length(x), 1)
-    x[i] <- x[i] + rnorm(1)
+    x[i] <- x[i] + rnorm(1, sd=2)
     return(x)
 }
 
@@ -113,7 +113,8 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
     # Initialize genomes
     genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))
     for (i in 1:numGenomes) {
-        genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)
+        #genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)
+        genomes[i,] <- c(rnorm(numGenes, mean=1, sd=2), Inf)
     }
 
     maxScores <- c()
@@ -203,11 +204,11 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
 
 main <- function() {
     numGenes <- 12
-    numGenomes <- 250
-    numParents <- 125
-    numElite <- 25
+    numGenomes <- 500
+    numParents <- 250
+    numElite <- 50
     mutationRate <- 0.2
-    numIter <- 10
+    numIter <- 20
 
     start_time <- Sys.time()
     res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=10)
@@ -239,4 +240,4 @@ main <- function() {
     plot(simDates.ll)
 }
 
-main()
+#main()
