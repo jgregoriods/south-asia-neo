@@ -211,7 +211,7 @@ main <- function() {
     numIter <- 20
 
     start_time <- Sys.time()
-    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=10)
+    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=11)
     total_time <- Sys.time() - start_time
     cat("Completed in",total_time[[1]],attributes(total_time)$units,"\n")
 
