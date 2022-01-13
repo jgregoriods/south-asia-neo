@@ -10,7 +10,7 @@ suppressPackageStartupMessages({
 
 use_sp()
 
-set.seed(123)
+set.seed(100)
 
 WGS <- CRS("+init=epsg:4326")
 ALBERS <- CRS("+proj=eqdc +lat_0=0 +lon_0=0 +lat_1=7 +lat_2=-32 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
@@ -72,13 +72,20 @@ simulateDispersal <- function(origin, start_date) {
     return(simDates)
 }
 
-compareDates <- function(simRaster, dates) {
+compareDates <- function(simRaster, dates, origin) {
     dates$simbp <- extract(simRaster, dates)
-    dates$dist <- spDistsN1(dates, ORIGIN, longlat=TRUE)
-    plot(dates$dist, dates$bp, xlab="Distance from origin (km)",
-         ylab="Age (cal BP)", pch=20, cex=1.5, cex.axis=1.5, cex.lab=1.5)
-    points(dates$dist, dates$simbp)
+    dates$dist <- spDistsN1(dates, origin) / 1000
+    ggplot(as.data.frame(dates)) +
+        geom_point(aes(x=dist, y=simbp, fill="Simulated"), shape=21, size=3) +
+        geom_point(aes(x=dist, y=bp, fill="C14"), shape=21, size=3) +
+        scale_fill_manual(values=c("white", "black")) +
+        labs(x="Distance from origin (km)", y="Age (yr BP)") +
+        theme(legend.position=c(0.9,0.9), legend.title=element_blank())
+    #plot(dist, dates$bp, xlab="Distance from origin (km)",
+    #     ylab="Age (cal BP)", pch=20, cex=1.5, cex.axis=1.5, cex.lab=1.5)
+    #points(dist, simbp)
 }
+compareDates(simDates, DATES.m, ORIGIN) ####################
 
 testModel <- function(costRaster, sites=DATES, origin=ORIGIN, start_date=START) {
     costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
@@ -104,7 +111,7 @@ crossover <- function(x, y) {
 
 mutate <- function(x) {
     i <- sample(1:length(x), 1)
-    x[i] <- x[i] + rnorm(1, sd=2)
+    x[i] <- x[i] + rnorm(1)
     return(x)
 }
 
@@ -114,7 +121,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate,
     genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))
     for (i in 1:numGenomes) {
         #genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)
-        genomes[i,] <- c(rnorm(numGenes, mean=1, sd=2), Inf)
+        genomes[i,] <- c(rnorm(numGenes, mean=1), Inf)
     }
 
     maxScores <- c()
@@ -211,7 +218,7 @@ main <- function() {
     numIter <- 20
 
     start_time <- Sys.time()
-    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=11)
+    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=10)
     total_time <- Sys.time() - start_time
     cat("Completed in",total_time[[1]],attributes(total_time)$units,"\n")
 
