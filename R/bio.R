@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
     library(rgrass7)
     library(raster)
     library(sp)
+    library(ggplot2)
 })
 
 use_sp()
@@ -25,8 +26,9 @@ coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- WGS
 DATES.m <- spTransform(DATES, ALBERS)
 
-ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="Mureybet",]@coords)
-START <- DATES.m[DATES.m$Site=="Mureybet",]$bp
+ORIGIN_SITE <- "Mureybet"
+ORIGIN <- as.numeric(DATES.m[DATES.m$Site==ORIGIN_SITE,]@coords)
+START <- DATES.m[DATES.m$Site==ORIGIN_SITE,]$bp
 
 #ORIGIN <- as.numeric(DATES.m[DATES.m$Site=="M'lefaat",]@coords)
 #START <- DATES.m[DATES.m$Site=="M'lefaat",]$bp
@@ -76,11 +78,11 @@ compareDates <- function(simRaster, dates, origin) {
     dates$simbp <- extract(simRaster, dates)
     dates$dist <- spDistsN1(dates, origin) / 1000
     ggplot(as.data.frame(dates)) +
-        geom_point(aes(x=dist, y=simbp, fill="Simulated"), shape=21, size=3) +
-        geom_point(aes(x=dist, y=bp, fill="C14"), shape=21, size=3) +
+        geom_point(aes(x=dist, y=simbp, fill="Simulated"), shape=21, size=2) +
+        geom_point(aes(x=dist, y=bp, fill="C14"), shape=21, size=2) +
         scale_fill_manual(values=c("white", "black")) +
         labs(x="Distance from origin (km)", y="Age (yr BP)") +
-        theme(legend.position=c(0.9,0.9), legend.title=element_blank())
+        theme(legend.position=c(0.85,0.95), legend.title=element_blank(), axis.text=element_text(color="black"))
     #plot(dist, dates$bp, xlab="Distance from origin (km)",
     #     ylab="Age (cal BP)", pch=20, cex=1.5, cex.axis=1.5, cex.lab=1.5)
     #points(dist, simbp)
