@@ -87,7 +87,6 @@ compareDates <- function(simRaster, dates, origin) {
     #     ylab="Age (cal BP)", pch=20, cex=1.5, cex.axis=1.5, cex.lab=1.5)
     #points(dist, simbp)
 }
-compareDates(simDates, DATES.m, ORIGIN) ####################
 
 testModel <- function(costRaster, sites=DATES, origin=ORIGIN, start_date=START) {
     costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
