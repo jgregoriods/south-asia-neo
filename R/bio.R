@@ -16,12 +16,12 @@ set.seed(100)
 WGS <- CRS("+init=epsg:4326")
 ALBERS <- CRS("+proj=eqdc +lat_0=0 +lon_0=0 +lat_1=7 +lat_2=-32 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 #RASTER_FILE <- "layers/biomes__.tif"
-RASTER_FILE <- "layers/biomes_b_rec_m.tif"
+RASTER_FILE <- "layers/biomes.tif"
 
 #ORIGIN <- c(43.5, 36.33)    # M'lefaat
 #START <- 12855
 #DATES <- read.csv("sites/dates100.csv")
-DATES <- read.csv("sites/dates_.csv")
+DATES <- read.csv("dates/dates.csv")
 coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- WGS
 DATES.m <- spTransform(DATES, ALBERS)
@@ -74,19 +74,26 @@ simulateDispersal <- function(origin, start_date) {
     return(simDates)
 }
 
-compareDates <- function(simRaster, dates, origin) {
-    dates$simbp <- extract(simRaster, dates)
-    dates$dist <- spDistsN1(dates, origin) / 1000
-    ggplot(as.data.frame(dates)) +
-        geom_point(aes(x=dist, y=simbp, fill="Simulated"), shape=21, size=2) +
-        geom_point(aes(x=dist, y=bp, fill="C14"), shape=21, size=2) +
-        scale_fill_manual(values=c("white", "black")) +
+compareDates <- function(simRaster, dates, origin, rmse) {
+    #dates$simbp <- extract(simRaster, dates)
+    dist <- spDistsN1(dates, origin) / 1000
+    merged <- rbind(data.frame("dist"=dist, "age"=dates$bp, "type"="C14"),
+                    data.frame("dist"=dist, "age"=extract(simRaster, dates), "type"="Simulated"))
+    ggplot(merged) +
+        geom_point(aes(x=dist, y=age, color=type, shape=type), size=2) +
+        annotate(geom="text", x=max(dist, na.rm=T) / 3, y=(max(merged$age, na.rm=T) + min(merged$age, na.rm=T)) / 3, label=paste("RMSE=", round(rmse), sep=""), color=4) +
+        #geom_point(aes(x=dist, y=simbp, fill="Simulated"), shape=3, size=2, col=4) +
+        scale_color_manual(values=c("black", 4)) +
+        scale_shape_manual(values=c(1, 3)) +
         labs(x="Distance from origin (km)", y="Age (yr BP)") +
+        theme_classic() +
         theme(legend.position=c(0.85,0.95), legend.title=element_blank(), axis.text=element_text(color="black"))
     #plot(dist, dates$bp, xlab="Distance from origin (km)",
     #     ylab="Age (cal BP)", pch=20, cex=1.5, cex.axis=1.5, cex.lab=1.5)
     #points(dist, simbp)
 }
+
+#compareDates(simDates, DATES.m, ORIGIN, res$maxScores[20])
 
 testModel <- function(costRaster, sites=DATES, origin=ORIGIN, start_date=START) {
     costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
