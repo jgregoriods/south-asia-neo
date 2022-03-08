@@ -1,11 +1,7 @@
-library(gdistance)
-library(rgdal)
 library(parallel)
-library(rasterVis)
-library(rgrass7)
-library(raster)
-library(sp)
 library(ggplot2)
+library(raster)
+library(rgrass7)
 
 
 # to use sp objects with rgrass7
@@ -19,7 +15,7 @@ WGS <- CRS("+init=epsg:4326")
 ALBERS <- CRS("+proj=eqdc +lat_0=0 +lon_0=0 +lat_1=7 +lat_2=-32 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
 # read files
-RASTER_FILE <- "layers/biomes.tif"
+RASTER_FILE <- "layers/biomes_.tif"
 DATES <- read.csv("dates/dates.csv")
 
 coordinates(DATES) <- ~Longitude+Latitude
@@ -261,15 +257,21 @@ plotDates <- function(simRaster, dates, origin, rmse) {
     merged <- rbind(data.frame("dist"=dist, "age"=dates$bp, "type"="C14"),
                     data.frame("dist"=dist, "age"=extract(simRaster, dates),
                     "type"="Simulated"))
+
     ggplot(merged) +
+        geom_vline(xintercept=900, color="grey", linetype="longdash") +
+        geom_vline(xintercept=3000, color="grey", linetype="longdash") +
         geom_point(aes(x=dist, y=age, color=type, shape=type), size=2) +
-        annotate(geom="text", x=max(dist, na.rm=T) / 3,
-                 y=(max(merged$age, na.rm=T) + min(merged$age, na.rm=T)) / 3,
-                 label=paste("RMSE=", round(rmse), sep=""), color=4) +
-        scale_color_manual(values=c("black", 4)) +
+        annotate(geom="text", x=max(dist, na.rm=T) / 1.5,
+                 y=(max(merged$age, na.rm=T) + min(merged$age, na.rm=T)) / 2,
+                 label=paste("RMSE=", round(rmse), sep=""), color="red") +
+        annotate(geom="text", x=700, y=5000, label="Zagros", color="grey", angle=90) +
+        annotate(geom="text", x=2800, y=5000, label="Indus", color="grey", angle=90) +
+        scale_color_manual(values=c("black", "red")) +
         scale_shape_manual(values=c(1, 3)) +
         labs(x="Distance from origin (km)", y="Age (yr BP)") +
         theme_classic() +
         theme(legend.position=c(0.85,0.95), legend.title=element_blank(),
               axis.text=element_text(color="black"))
 }
+plotDates(simDates, DATES.m, ORIGIN, best[12])

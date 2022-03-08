@@ -2,7 +2,7 @@ source("src/src.R")
 
 
 main <- function() {
-    numGenes <- 12
+    numGenes <- 11
     numGenomes <- 500
     numParents <- 250
     numElite <- 50
@@ -21,6 +21,10 @@ main <- function() {
     names(costSPDF@data) <- c("val")
 
     setGRASS(costSPDF, 25000)
+    
+    speedRaster <- 1 / costRaster
+    speedRaster.wgs <- projectRaster(speedRaster, res=0.25, crs=WGS, method="ngb")
+    speedRaster.cropped <- crop(speedRaster.wgs, extent(DATES))
 
     simDates <- simulateDispersal(ORIGIN, START)
     simDates.wgs <- projectRaster(simDates, res=0.25, crs=WGS)
@@ -31,9 +35,12 @@ main <- function() {
     timeStamp <- round(as.numeric(Sys.time()))
 
     speeds <- data.frame("region"=1:numGenes, "speed"=1/best[1:numGenes])
+    writeRaster(speedRaster, paste("results/speed", timeStamp, ".tif", sep=""))
     write.csv(speeds, file=paste("results/res", timeStamp, ".csv", sep=""))
     save(res, simDates, file=paste("results/ga", timeStamp, ".RData", sep=""))
     writeRaster(simDates.r, paste("results/sim", timeStamp, ".tif", sep=""))
+
+    plotDates(simDates, DATES.m, ORIGIN, best[11])
 }
 
 
