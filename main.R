@@ -8,9 +8,10 @@ main <- function() {
     numElite <- 50
     mutationRate <- 0.2
     numIter <- 20
+    originSite <- "Dhra"
 
     startTime <- Sys.time()
-    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=10)
+    res <- GA(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, originSite, cores=10)
     totalTime <- Sys.time() - startTime
     cat("Completed in",totalTime[[1]],attributes(totalTime)$units,"\n")
 

@@ -22,9 +22,9 @@ coordinates(DATES) <- ~Longitude+Latitude
 proj4string(DATES) <- WGS
 DATES.m <- spTransform(DATES, ALBERS)
 
-ORIGIN_SITE <- "Mureybet"
-ORIGIN <- as.numeric(DATES.m[DATES.m$Site==ORIGIN_SITE,]@coords)
-START <- DATES.m[DATES.m$Site==ORIGIN_SITE,]$bp
+#ORIGIN_SITE <- "Mureybet"
+#ORIGIN <- as.numeric(DATES.m[DATES.m$Site==ORIGIN_SITE,]@coords)
+#START <- DATES.m[DATES.m$Site==ORIGIN_SITE,]$bp
 
 BIOMES <- raster(RASTER_FILE)
 BIOMES.sp <- as(BIOMES, "SpatialPixelsDataFrame")
@@ -113,7 +113,7 @@ mutate <- function(x) {
 #' @param startDate Start of the dispersal in years BP.
 #' @return The RMSE between simulated and real dates.
 #'
-testModel <- function(costRaster, sites=DATES, origin=ORIGIN, startDate=START) {
+testModel <- function(costRaster, sites, origin, startDate) {
     costSPDF <- as(costRaster, "SpatialPixelsDataFrame")
     names(costSPDF@data) <- c("val")
     # We are using a cell size of 25 km
@@ -136,11 +136,17 @@ testModel <- function(costRaster, sites=DATES, origin=ORIGIN, startDate=START) {
 #' @param mutationRate Chance of mutations happening.
 #' @param numIter Number of generations (iterations) of the algorithm.
 #' @param cores Number of cores for parallel processing.
+#' @param originSite A string. Name of a site in the DATES data frame to be
+#' used as origin of the dispersal.
 #' @return A list of vectors with the following attributes: genomes, containing
 #' all the genome vectors; maxScores, containing the best score per generation;
 #' and avgScores, with the average scores per generation.
 #'
-GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, cores=NULL) {
+GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter, originSite, cores=NULL) {
+    # Coordinates of the origin site and start yr BP
+    ORIGIN <- as.numeric(DATES.m[DATES.m$Site==originSite,]@coords)
+    START <- DATES.m[DATES.m$Site==originSite,]$bp
+
     # Initialize genomes with values from a random normal distribution
     # with mean = 1. The last value in the genome is its score
     genomes <- as.data.frame(matrix(nrow=numGenomes, ncol=numGenes+1))
@@ -197,7 +203,7 @@ GA <- function(numGenes, numGenomes, numParents, numElite, mutationRate, numIter
                     # values, simulate the arrival times and evaluate
                     reclassMatrix <- cbind(1:numGenes, as.numeric(x[1,1:numGenes]))
                     cost <- reclassify(BIOMES, reclassMatrix)
-                    score <- testModel(cost)
+                    score <- testModel(cost, DATES, ORIGIN, START)
                     gc()
                     return(score)
                 }
@@ -274,4 +280,4 @@ plotDates <- function(simRaster, dates, origin, rmse) {
         theme(legend.position=c(0.85,0.95), legend.title=element_blank(),
               axis.text=element_text(color="black"))
 }
-plotDates(simDates, DATES.m, ORIGIN, best[12])
+#plotDates(simDates, DATES.m, ORIGIN, best[12])
