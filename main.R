@@ -1,6 +1,6 @@
 source("src/src.R")
 
-# Parameters for the genetic algorithm. We will be using 11 terrain classes,
+# Parameters for the genetic algorithm. We will be using 10 terrain classes,
 # a population of 500, 250 parents to be transmitted to the next generation,
 # 50 elite (preserved without mutation), 2% chance of mutation and 20 generations.
 numGenes <- 10

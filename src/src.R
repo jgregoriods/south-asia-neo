@@ -8,7 +8,7 @@ library(rgrass7)
 use_sp()
 
 # for reproducibility
-set.seed(123)
+set.seed(99)
 
 # define projections
 WGS <- CRS("+init=epsg:4326")
